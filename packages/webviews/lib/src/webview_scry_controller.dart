@@ -26,11 +26,16 @@ abstract class WebviewScryController {
     );
   }
 
-  Future<void> loadRequest(Uri uri) async{}
+  Future<void> loadRequest(Uri uri) async {}
+
   Future<void> goBack() async {}
+
   Future<void> goForward() async {}
+
   Future<void> go({required Uri uri}) async {}
+
   Future<void> setNavigationDelegate(NavigationDelegate delegate) async {}
+
   Future<void> addJavaScriptChannel(
     String name, {
     required void Function(JavaScriptMessage) onMessageReceived,
@@ -38,8 +43,7 @@ abstract class WebviewScryController {
 
   Future<void> removeJavaScriptChannel(String javaScriptChannelName) async {}
 
-  Future<void> runJavaScript(String javaScript) async {
-  }
+  Future<void> runJavaScript(String javaScript) async {}
 
   Future<Object> runJavaScriptReturningResult(String javaScript) async {
     return Object();
@@ -48,5 +52,6 @@ abstract class WebviewScryController {
   Future<String> getTitle() async {
     return "";
   }
-  Future<void> close() async{}
+
+  Future<void> close() async {}
 }

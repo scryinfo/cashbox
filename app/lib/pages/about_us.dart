@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:package_info/package_info.dart';
 
 class AboutUsPage extends StatefulWidget {
   @override
@@ -25,8 +24,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
   }
 
   initData() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    appVersion = packageInfo.version;
+    appVersion = await AppInfoControl.instance.getAppVersion();
     setState(() {
       this.appVersion = appVersion;
     });

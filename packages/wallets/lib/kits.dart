@@ -342,10 +342,16 @@ class NoCacheString {
 String _platformPath(String name, {String? path}) {
   if (path == null) path = "";
   String dlPath = "";
-  if (Platform.isLinux || Platform.isAndroid) {
+  if (Platform.isAndroid) {
     dlPath = pathLib.join(path, "lib" + name + ".so");
     // dlPath = "/home/scry/gopath/src/github.com/scryinfo/cashbox/packages/wallets/libwallets_cdl.so";
-  } else if (Platform.isMacOS) {
+  } else if(Platform.isLinux){
+    dlPath = pathLib.join(path, "lib" + name + ".so");
+    dlPath = Platform.script.resolve(dlPath).path;
+    // if (!(File(dlPath).existsSync())) {
+    //   dlPath = Platform.script.resolve(dlPath).path;
+    // }
+  }else if (Platform.isMacOS) {
     dlPath = pathLib.join(path, "lib" + name + ".dylib");
   } else if (Platform.isWindows) {
     dlPath = pathLib.join(path, name + ".dll");

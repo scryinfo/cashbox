@@ -7,7 +7,7 @@ import 'package:app/model/chain.dart';
 import 'package:app/model/token_rate.dart';
 import 'package:app/model/wallet.dart' as WalletM;
 import 'package:logger/logger.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as pathProvider;
 import 'package:wallets/enums.dart' as EnumKit;
 import 'package:wallets/kits.dart';
 import 'package:wallets/result.dart';
@@ -28,7 +28,15 @@ class WalletsControl {
   Future<void> initWallet() async {
     var initP = new InitParameters();
     try {
-      Directory? directory = await getExternalStorageDirectory(); // path:  Android/data/
+      Directory? directory = null;
+      // see https://pub.dev/packages/path_provider
+      // getExternalStorageDirectory only support in android
+      if (Platform.isAndroid) {
+        directory = await pathProvider.getExternalStorageDirectory(); // path:  Android/data/
+      } else {
+        directory = await pathProvider.getApplicationDocumentsDirectory();
+      }
+
       if (directory == null) {
         return;
       }

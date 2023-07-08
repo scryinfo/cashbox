@@ -5,7 +5,7 @@ import 'package:app/configv/config/handle_config.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -68,7 +68,18 @@ class AppInfoControl {
 
   //Get app signature information
   Future<String> getAppSignInfo() async {
-    String appSignInfo = await appInfoChannel.invokeMethod(APP_SIGNINFO_METHOD);
+    String appSignInfo = "";
+    if (Platform.isAndroid) {
+      appSignInfo = await appInfoChannel.invokeMethod(APP_SIGNINFO_METHOD);
+    } else if (Platform.isIOS) {
+      //todo
+    } else if (Platform.isLinux) {
+      //todo
+    } else if (Platform.isWindows) {
+      //todo
+    } else if (Platform.isMacOS) {
+      //todo
+    }
     return appSignInfo;
   }
 
@@ -106,6 +117,39 @@ class AppInfoControl {
         DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
         var info = await _deviceInfoPlugin.iosInfo;
         var tid = info.identifierForVendor;
+        if (tid == null) {
+          tid = await PlatformDeviceId.getDeviceId;
+        }
+        if (tid != null) {
+          deviceId = tid;
+        }
+      } else if (Platform.isLinux) {
+        DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+        var info = await _deviceInfoPlugin.linuxInfo;
+        var tid = info.machineId;
+        if (tid == null) {
+          tid = await PlatformDeviceId.getDeviceId;
+        }
+        if (tid != null) {
+          deviceId = tid;
+        }
+      } else if (Platform.isWindows) {
+        DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+        var info = await _deviceInfoPlugin.windowsInfo;
+        String tid = info.deviceId;
+        if (tid.isEmpty) {
+          var t = await PlatformDeviceId.getDeviceId;
+          if (t != null) {
+            tid = t!;
+          }
+        }
+        if (tid.isNotEmpty) {
+          deviceId = tid;
+        }
+      } else if (Platform.isMacOS) {
+        DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
+        var info = await _deviceInfoPlugin.macOsInfo;
+        var tid = info.systemGUID;
         if (tid == null) {
           tid = await PlatformDeviceId.getDeviceId;
         }

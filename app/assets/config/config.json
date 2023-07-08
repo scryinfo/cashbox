@@ -52,18 +52,18 @@
   "eeeSymbol": "Eee",
   "privateConfig": {
     "serverConfigIp": "https://cashbox.scry.info/inner_api/config/check",
-    "serverApkVersionKey": "2.1.0",
+    "serverApkVersion": "2.1.0",
     "configVersion": "1.0.0",
     "downloadAppUrl": "https://cashbox.scry.info/cashbox/api/apk/download",
     "downloadLatestAppUrl": "https://cashbox.scry.info/cashbox/api/apk/downloadlatest",
     "rateUrl": "https://cashbox.scry.info/inner_api/market/pricerate",
     "authDigitVersion": 1,
-    "authDigitIp": [
+    "authDigitIpList": [
       "https://cashbox.scry.info/inner_api/token/erc20/authlist",
       "authIp_2"
     ],
     "defaultDigitVersion": 2,
-    "defaultDigitIp": [
+    "defaultDigitIpList": [
       "https://cashbox.scry.info/inner_api/token/erc20/defaultlist",
       "defaultDigitIp_2"
     ],

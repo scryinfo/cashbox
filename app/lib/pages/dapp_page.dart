@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:app/configv/config/config.dart';
 import 'package:app/configv/config/handle_config.dart';
+import 'package:app/control/app_info_control.dart';
 import 'package:app/control/eee_chain_control.dart';
 import 'package:app/control/eth_chain_control.dart';
 import 'package:app/control/qr_scan_control.dart';
@@ -17,7 +18,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
-import 'package:package_info/package_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:wallets/enums.dart';
@@ -510,9 +510,7 @@ class _DappPageState extends State<DappPage> {
     };
     jsChannelList["cashboxAppVersion"] = (JavaScriptMessage message) async {
       var msg = Message.fromJson(jsonDecode(message.message));
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      String apkVersion = packageInfo.version;
-      msg.data = apkVersion;
+      msg.data = await AppInfoControl.instance.getAppVersion();
       this.callPromise(msg);
     };
     return jsChannelList;

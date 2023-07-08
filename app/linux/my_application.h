@@ -4,8 +4,7 @@
 #include <gtk/gtk.h>
 
 G_DECLARE_FINAL_TYPE(MyApplication, my_application, MY, APPLICATION,
-        GtkApplication
-)
+                     GtkApplication)
 
 /**
  * my_application_new:
@@ -14,6 +13,6 @@ G_DECLARE_FINAL_TYPE(MyApplication, my_application, MY, APPLICATION,
  *
  * Returns: a new #MyApplication.
  */
-MyApplication *my_application_new();
+MyApplication* my_application_new();
 
 #endif  // FLUTTER_MY_APPLICATION_H_

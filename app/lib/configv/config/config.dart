@@ -11,7 +11,7 @@ class Config extends Object {
   int lastTimeConfigCheck = 0;
   int intervalMilliseconds = 0;
   String currency = "";
-  String locale = "";
+  String locale = "en";
   List<Language> languages = [];
   String diamondCa = ""; //diamond Dapp contractAddress
 

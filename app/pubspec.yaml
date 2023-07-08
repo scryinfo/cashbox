@@ -24,6 +24,7 @@ dependencies:
   flutter_html: ^3.0.0-beta.2
   device_info_plus: ^9.0.2
   platform_device_id: ^1.0.1
+  package_info_plus: ^4.0.2
   #  device_info: ^1.0.0
   #  flutter_progress_button: ^1.0.0
   progress_loading_button: ^2.0.2
@@ -39,7 +40,6 @@ dependencies:
   web_socket_channel: ^2.4.0
   stream_channel: ^2.1.1
   path_provider: ^2.0.1
-  package_info: ^2.0.2
   permission_handler: ^10.3.0
   json_rpc_2: ^3.0.2
   grpc: ^3.2.2
