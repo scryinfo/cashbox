@@ -1,11 +1,12 @@
+use std::ops::Add;
 use std::os::raw::c_char;
+
 // use chrono::{
 //     offset::Utc,
 //     DateTime,
 //     NaiveDate,
 // };
-use rustorm::{DbError, FromDao, Pool, ToColumnNames, ToDao, ToTableName, rustorm_dao, Value};
-use std::ops::Add;
+use rustorm::{DbError, FromDao, Pool, rustorm_dao, ToColumnNames, ToDao, ToTableName, Value};
 
 #[no_mangle]
 pub extern "C" fn tryRustOrm(name: *mut c_char) {
@@ -21,8 +22,9 @@ pub extern "C" fn tryRustOrm(name: *mut c_char) {
     }
 
     mod for_retrieve {
-        use super::*;
         use chrono::NaiveDateTime;
+
+        use super::*;
 
         #[derive(Debug, FromDao, ToColumnNames, ToTableName)]
         pub struct Actor {
@@ -45,7 +47,7 @@ pub extern "C" fn tryRustOrm(name: *mut c_char) {
     let db_url = db_url.as_str();
 
     let mut pool = Pool::new();
-    let em = pool.em(db_url).unwrap();
+    let mut em = pool.em(db_url).unwrap();
 
     {
         let sql = "drop table actor";

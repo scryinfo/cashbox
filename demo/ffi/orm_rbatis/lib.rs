@@ -1,12 +1,14 @@
 #[macro_use]
 extern crate rbatis;
 
-use std::os::raw::c_char;
-use async_std::task::block_on;
 use std::ops::Add;
+use std::os::raw::c_char;
+
+use async_std::task::block_on;
 use rbatis::RBatis;
 use rbatis::rbdc::datetime::DateTime;
 use serde::{Deserialize, Serialize};
+
 use shared::to_str;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -66,7 +68,7 @@ pub extern "C" fn tryRbatis(name: *mut c_char) {
                                 `pc_banner_img` varchar(255) DEFAULT NULL,
                                 `h5_banner_img` varchar(255) DEFAULT NULL,
                                 PRIMARY KEY (`id`) ) ;";
-    let r = block_on(rb.exec(sql,vec![]));
+    let r = block_on(rb.exec(sql, vec![]));
     if r.is_err() {
         log::info!("{:?}",r.err().unwrap());
     }
@@ -84,7 +86,7 @@ pub extern "C" fn tryRbatis(name: *mut c_char) {
         version: Some(1),
         delete_flag: Some(1),
     };
-    let r = block_on(BizActivity::insert(&mut rb,&activity));
+    let r = block_on(BizActivity::insert(&mut rb, &activity));
     if r.is_err() {
         log::info!("{:?}",r.err().unwrap());
     }

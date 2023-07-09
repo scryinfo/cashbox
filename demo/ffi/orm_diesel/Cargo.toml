@@ -14,7 +14,7 @@ libc = "0.2.80"
 shared = { path = "../shared" }
 log = "0.4"
 #diesel
-diesel = { version = "1.4.5", features = ["sqlite"] }
+diesel = { version = "2.1.0", features = ["sqlite"] }
 libsqlite3-sys = { version = "*", features = ["bundled"] }
 dotenv = "0.15.0"
 serde = "1.0"
@@ -27,5 +27,6 @@ opt-level = 'z'     # Optimize for size.
 lto = true          # Enable Link Time Optimization
 codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 panic = 'abort'     # Abort on panic
+
 
 [workspace]

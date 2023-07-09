@@ -35,7 +35,7 @@ pub extern "C" fn tryDiesel(name: *mut c_char) {
     let db_url = "".to_owned().add(db_name);
     let db_url = db_url.as_str();
 
-    let con = establish_connection(db_url);
+    let mut con = establish_connection(db_url);
 
     {
         let sql = "drop table posts";
@@ -58,11 +58,11 @@ pub extern "C" fn tryDiesel(name: *mut c_char) {
         title: "sdf".to_owned(),
         body: "d".to_owned(),
         published: false,
-    }).execute(&con);
+    }).execute(&mut con);
     if ret.is_err() {
         log::info!("ret: {:?}", ret);
     }
-    let ret = posts.limit(1).load::<Post>(&con);
+    let ret = posts.limit(1).load::<Post>(&mut con);
     if ret.is_err() {
         log::info!("ret: {:?}", ret);
     }

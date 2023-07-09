@@ -1,13 +1,15 @@
-use rbatis_macro_driver::crud_enable;
-use serde::{Serialize, Deserialize};
-use rbatis::rbatis::Rbatis;
+#[macro_use]
+extern crate rbatis;
+
 use std::ops::Add;
+
 use async_std::task::block_on;
-use rbatis::crud::CRUD;
-use rbatis::plugin::page::{PageRequest, Page, IPage};
+use rbatis::RBatis;
+use rbatis::sql::page::{IPage, Page, PageRequest};
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-#[crud_enable(table_name: block_header)]
+// #[crud_enable(table_name: block_header)]
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MBlockHeader {
     pub id: Option<u64>,
@@ -15,14 +17,20 @@ pub struct MBlockHeader {
     pub scanned: String,
     pub timestamp: String,
 }
+crud!(MBlockHeader{});
+impl_select_page!(MBlockHeader{select_page_by_t(timestamp:&str) =>"`where timestamp > #{timestamp}`"});
+impl_select!(MBlockHeader{selec_sql() -> Option => "`order by id DESC limit 1`"});
 
-#[crud_enable(table_name: progress)]
+// #[crud_enable(table_name: progress)]
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MProgress {
     pub id: Option<u64>,
     pub header: String,
     pub timestamp: String,
 }
+crud!(MProgress{});
+impl_select!(MProgress{selec_by_id(id:&u64) ->Option => "`where id = #{id} limit 1`"});
+
 
 pub fn create_chain_sql() -> &'static str {
     "CREATE TABLE IF NOT EXISTS block_header(id INTEGER PRIMARY KEY AUTOINCREMENT,header TEXT,scanned TEXT,timestamp TEXT);"
@@ -49,11 +57,11 @@ pub fn create_local_tx_sql() -> &'static str {
 }
 
 pub struct ChainSqlite {
-    rb: Rbatis,
+    rb: RBatis,
     url: String,
 }
 
-async fn init_rbatis(db_file_name: &str) -> Rbatis {
+async fn init_rbatis(db_file_name: &str) -> RBatis {
     print!("init_rbatis");
     if std::fs::metadata(db_file_name).is_err() {
         let file = std::fs::File::create(db_file_name);
@@ -61,10 +69,10 @@ async fn init_rbatis(db_file_name: &str) -> Rbatis {
             print!("init file {:?}", file.err().unwrap());
         }
     }
-    let rb = Rbatis::new();
+    let rb = RBatis::new();
     let url = "sqlite://".to_owned().add(db_file_name);
     print!("file url: {:?}", url);
-    let r = rb.link(url.as_str()).await;
+    let r = rb.link(rbdc_sqlite::driver::SqliteDriver {}, url.as_str()).await;
     if r.is_err() {
         print!("{:?}", r.err().unwrap());
     }
@@ -75,7 +83,8 @@ impl ChainSqlite {
     pub fn init_chain_db(db_file_name: &str) -> Self {
         let sql = include_str!("sql/create_chain.sql");
         let rb = block_on(init_rbatis(db_file_name));
-        let r = block_on(rb.exec("create chain db", sql));
+        // "create chain db"
+        let r = block_on(rb.exec(sql, vec![]));
         match r {
             Ok(a) => {
                 println!("create {:?}", a);
@@ -91,7 +100,7 @@ impl ChainSqlite {
         }
     }
 
-    pub fn save_chain(&self) {
+    pub fn save_chain(&mut self) {
         let block_header = MBlockHeader {
             id: None,
             header: "dadasdasdqwvfev".to_string(),
@@ -99,7 +108,7 @@ impl ChainSqlite {
             timestamp: "11".to_string(),
         };
 
-        let r = block_on(self.rb.save("", &block_header));
+        let r = block_on(MBlockHeader::insert(&mut self.rb, &block_header));
         match r {
             Ok(a) => {
                 println!("save {:?}", a);
@@ -124,14 +133,9 @@ impl ChainSqlite {
     /// fetch header which needed scan
     /// scan_flag = false scan_flag does not need +1
     /// scan_flag = true scan_flag need +1
-    pub fn fetch_scan_header(&self, timestamp: String, scan_flag: bool) -> Vec<String> {
-        let w = self.rb.new_wrapper()
-                    .gt("timestamp", &timestamp)
-                    .and()
-                    .lt("scanned", 6)
-                    .check().unwrap();
+    pub fn fetch_scan_header(&mut self, timestamp: String, scan_flag: bool) -> Vec<String> {
         let req = PageRequest::new(1, 1000);
-        let r: Result<Page<MBlockHeader>, _> = block_on(self.rb.fetch_page_by_wrapper("", &w, &req));
+        let r: Result<Page<MBlockHeader>, _> = block_on(MBlockHeader::select_page_by_t(&mut self.rb, &req, &timestamp));
         let mut block_headers: Vec<MBlockHeader> = vec![];
         match r {
             Ok(page) => {
@@ -158,7 +162,7 @@ impl ChainSqlite {
                     ) tmp
                 )
             "#, timestamp);
-            let r = block_on(self.rb.exec("", &sql));
+            let r = block_on(self.rb.exec(&sql, vec![]));
             match r {
                 Ok(a) => {
                     println!("{:?}", a);
@@ -173,14 +177,14 @@ impl ChainSqlite {
     }
 
     // how may headers save in block_header table
-    pub fn fetch_height(&self) -> u64 {
+    pub fn fetch_height(&mut self) -> u64 {
         let py = r#"
         SELECT * FROM block_header
         Order By id DESC
         LIMIT 1;
         "#;
-        let r: Result<MBlockHeader, _> = block_on(self.rb.py_fetch("", py, &""));
-        if let Ok(r) = r {
+        let r: Result<Option<MBlockHeader>, _> = block_on(MBlockHeader::selec_sql(&mut self.rb));
+        if let Ok(Some(r)) = r {
             match r.id {
                 Some(id) => id,
                 _ => 0
@@ -191,7 +195,7 @@ impl ChainSqlite {
 
 
 pub struct DetailSqlite {
-    rb: Rbatis,
+    rb: RBatis,
 }
 
 impl DetailSqlite {
@@ -207,9 +211,9 @@ impl DetailSqlite {
         }
     }
 
-    fn create_user_address(rb: &Rbatis) {
+    fn create_user_address(rb: &RBatis) {
         let sql = create_user_address_sql();
-        let r = block_on(rb.exec("create chain db", sql));
+        let r = block_on(rb.exec(sql, vec![]));
         match r {
             Ok(a) => {
                 println!("{:?}", a);
@@ -220,9 +224,9 @@ impl DetailSqlite {
         }
     }
 
-    fn create_tx_input(rb: &Rbatis) {
+    fn create_tx_input(rb: &RBatis) {
         let sql = include_str!("sql/create_tx_input.sql");
-        let r = block_on(rb.exec("create chain db", sql));
+        let r = block_on(rb.exec(sql, vec![]));
         match r {
             Ok(a) => {
                 println!("{:?}", a);
@@ -233,9 +237,9 @@ impl DetailSqlite {
         }
     }
 
-    fn create_tx_output(rb: &Rbatis) {
+    fn create_tx_output(rb: &RBatis) {
         let sql = create_tx_output_sql();
-        let r = block_on(rb.exec("create chain db", sql));
+        let r = block_on(rb.exec(sql, vec![]));
         match r {
             Ok(a) => {
                 println!("{:?}", a);
@@ -246,9 +250,9 @@ impl DetailSqlite {
         }
     }
 
-    fn create_progress(rb: &Rbatis) {
+    fn create_progress(rb: &RBatis) {
         let sql = include_str!("sql/create_progress.sql");
-        let r = block_on(rb.exec("create chain db", sql));
+        let r = block_on(rb.exec(sql, vec![]));
         match r {
             Ok(a) => {
                 println!("{:?}", a);
@@ -259,9 +263,9 @@ impl DetailSqlite {
         }
     }
 
-    fn create_local_tx(rb: &Rbatis) {
+    fn create_local_tx(rb: &RBatis) {
         let sql = create_local_tx_sql();
-        let r = block_on(rb.exec("create chain db", sql));
+        let r = block_on(rb.exec(sql, vec![]));
         match r {
             Ok(a) => {
                 println!("{:?}", a);
@@ -272,13 +276,13 @@ impl DetailSqlite {
         }
     }
 
-    fn save_progress(&self, header: String, timestamp: String) {
+    fn save_progress(&mut self, header: String, timestamp: String) {
         let progress = MProgress {
             id: None,
             header,
             timestamp,
         };
-        let r = block_on(self.rb.save("", &progress));
+        let r = block_on(MProgress::insert(&mut self.rb, &progress));
         match r {
             Ok(a) => {
                 println!("save_progress {:?}", a);
@@ -289,22 +293,21 @@ impl DetailSqlite {
         }
     }
 
-    fn fetch_progress(&self) -> Option<MProgress> {
-        let r: Result<Option<MProgress>, _> = block_on(self.rb.fetch_by_id("", &1u64));
+    fn fetch_progress(&mut self) -> Option<MProgress> {
+        let r: Result<Option<MProgress>, _> = block_on(MProgress::selec_by_id(&mut self.rb, &1u64));
         match r {
             Ok(p) => p,
             Err(_) => None
         }
     }
 
-    pub fn update_progress(&self, header: String, timestamp: String) {
+    pub fn update_progress(&mut self, header: String, timestamp: String) {
         let progress = MProgress {
             id: None,
             header,
             timestamp,
         };
-        let w = self.rb.new_wrapper().eq("id", 1).check().unwrap();
-        let r = block_on(self.rb.update_by_wrapper("", &progress, &w, false));
+        let r = block_on(MProgress::update_by_column(&mut self.rb, &progress, "id"));
         match r {
             Ok(a) => {
                 println!("update_progress {:?}", a);
@@ -315,7 +318,7 @@ impl DetailSqlite {
         }
     }
 
-    pub fn progress(&self) -> MProgress {
+    pub fn progress(&mut self) -> MProgress {
         let progress = self.fetch_progress();
         match progress {
             None => {

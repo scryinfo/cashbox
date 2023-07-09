@@ -11,7 +11,7 @@ libc = "0.2.80"
 log = "0.4.0"
 
 [target.'cfg(target_os="android")'.dependencies]
-android_logger = "0.9.0"
+android_logger = "0.13.1"
 
 # rbatis end
 [lib]

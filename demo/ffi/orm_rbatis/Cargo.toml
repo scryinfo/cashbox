@@ -17,9 +17,9 @@ chrono = { version = "0.4", features = ["serde"] }
 log = "0.4"
 bigdecimal = "0.3.1"
 #, features = ["sqlite","async-io"]
-rbs={version="4.3"}
-rbatis = { version = "4.3"}
-rbdc-sqlite={version = "4.3"}
+rbs = { version = "4.3" }
+rbatis = { version = "4.3" }
+rbdc-sqlite = { version = "4.3" }
 
 async-std = { version = "1.9" }
 #sqlx-core = { features = ["runtime-async-std-rustls"] }
@@ -41,5 +41,6 @@ opt-level = 'z'     # Optimize for size.
 lto = true          # Enable Link Time Optimization
 codegen-units = 1   # Reduce number of codegen units to increase optimizations.
 panic = 'abort'     # Abort on panic
+
 
 [workspace]

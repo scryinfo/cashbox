@@ -11,6 +11,4 @@ path = "lib.rs"
 members = [
     "cdl",
     "shared",
-#    "orm/vendor/openssl-sys"
-
 ]
