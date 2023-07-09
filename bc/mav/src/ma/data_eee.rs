@@ -1,5 +1,5 @@
-use rbatis::crud::CRUDTable;
-use rbatis_macro_driver::CRUDTable;
+// use rbatis::crud::CRUDTable;
+// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -11,7 +11,7 @@ use crate::ma::TxShared;
 
 //eee
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainToken {
     #[serde(default)]
     pub next_id: String,
@@ -40,7 +40,7 @@ impl MEeeChainToken {
 }
 
 /// eee chain的交易
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTx {
     #[serde(flatten)]
@@ -68,7 +68,7 @@ impl MEeeChainTx {
     }
 }
 
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeTokenxTx {
     #[serde(flatten)]
@@ -97,7 +97,7 @@ impl MEeeTokenxTx {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MSubChainBasicInfo {
     #[serde(default)]
     pub genesis_hash: String,
@@ -124,7 +124,7 @@ impl MSubChainBasicInfo {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MAccountInfoSyncProg {
     #[serde(default)]
     pub account: String,

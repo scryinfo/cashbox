@@ -1,5 +1,5 @@
-use rbatis::crud::CRUDTable;
-use rbatis_macro_driver::CRUDTable;
+// use rbatis::crud::CRUDTable;
+// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
@@ -38,7 +38,7 @@ impl ToString for BtcTokenType {
 }
 
 //btc
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenShared {
     #[serde(flatten)]
@@ -60,7 +60,7 @@ impl MBtcChainTokenShared {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenAuth {
     /// [BtcChainTokenShared]
     #[serde(default)]
@@ -81,7 +81,7 @@ impl MBtcChainTokenAuth {
 }
 
 /// DefaultToken must be a [BtcChainTokenAuth]
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTokenDefault {
     /// [BtcChainTokenShared]
@@ -106,7 +106,7 @@ impl MBtcChainTokenDefault {
 
 //murmel defined
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MProgress {
     #[serde(default)]
     pub header: String,
@@ -121,7 +121,7 @@ impl MProgress {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MLocalTxLog {
     #[serde(default)]
     pub address_from: String,

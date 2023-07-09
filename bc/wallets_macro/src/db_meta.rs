@@ -5,6 +5,7 @@ use std::sync::Mutex;
 
 use once_cell::sync::OnceCell;
 use proc_macro_roids::DeriveInputStructExt;
+use quote::ToTokens;
 use syn::{AngleBracketedGenericArguments, Fields, GenericArgument, PathArguments, PathSegment, Type, TypePath};
 
 use crate::to_snake_name;
@@ -186,9 +187,9 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
             _ => {
                 //#[serde(skip)]
                 let skip = field.attrs.iter().any(|it| {
-                    if it.path.segments.iter().any(|p| p.ident == "serde") {
+                    if it.path().segments.iter().any(|p| p.ident == "serde") {
                         //todo 找到具体的path,而不用整个生成字符串
-                        it.tokens.to_string().find("skip").is_some()
+                        it.to_token_stream().to_string().find("skip").is_some()
                     } else {
                         false
                     }
@@ -198,9 +199,9 @@ fn generate_table_script(type_name: &str, fields: &Fields) -> TableMeta {
                 }
                 //#[serde(flatten)]
                 let flatten = field.attrs.iter().any(|it| {
-                    if it.path.segments.iter().any(|p| p.ident.to_string() == "serde") {
+                    if it.path().segments.iter().any(|p| p.ident.to_string() == "serde") {
                         //todo 找到具体的path,而不用整个生成字符串
-                        it.tokens.to_string().find("flatten").is_some()
+                        it.to_token_stream().to_string().find("flatten").is_some()
                     } else {
                         false
                     }

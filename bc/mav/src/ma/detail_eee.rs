@@ -1,5 +1,7 @@
-use rbatis::crud::CRUDTable;
-use rbatis_macro_driver::CRUDTable;
+// use rbatis::crud::CRUDTable;
+use rbatis::crud;
+use rbs;
+// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
@@ -41,7 +43,7 @@ impl ToString for EeeTokenType {
 }
 
 // eee
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenShared {
     #[serde(flatten)]
@@ -65,7 +67,7 @@ impl MEeeChainTokenShared {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenAuth {
     /// [EeeChainTokenShared]
     #[serde(default)]
@@ -78,6 +80,7 @@ pub struct MEeeChainTokenAuth {
     #[serde(default)]
     pub status: i64,
 }
+crud!(MEeeChainTokenAuth{});
 
 impl MEeeChainTokenAuth {
     pub const fn create_table_script() -> &'static str {
@@ -86,7 +89,7 @@ impl MEeeChainTokenAuth {
 }
 
 /// DefaultToken must be a [EeeChainTokenAuth]
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEeeChainTokenDefault {
     /// [EeeChainTokenShared]

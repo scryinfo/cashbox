@@ -1,5 +1,5 @@
-use rbatis::crud::CRUDTable;
-use rbatis_macro_driver::CRUDTable;
+// use rbatis::crud::CRUDTable;
+// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
@@ -41,7 +41,7 @@ impl ToString for EthTokenType {
 }
 
 //eth
-#[db_append_shared(CRUDTable)] //
+#[db_append_shared()] //
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTokenShared {
     #[serde(flatten)]
@@ -63,7 +63,7 @@ impl MEthChainTokenShared {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTokenAuth {
     /// [EthChainTokenShared]
     #[serde(default)]
@@ -90,7 +90,7 @@ impl MEthChainTokenAuth {
 }
 
 /// DefaultToken must be a [EthChainTokenAuth]
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTokenDefault {
     /// [crate::db::TokenShared]
@@ -118,7 +118,7 @@ impl MEthChainTokenDefault {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTokenNonAuth {
     #[serde(default)]
     pub chain_token_shared_id: String,

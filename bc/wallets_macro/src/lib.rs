@@ -1,8 +1,9 @@
 use proc_macro::TokenStream;
+use std::str::FromStr;
 
 use proc_macro_roids::{DeriveInputStructExt, FieldsNamedAppend};
-use quote::quote;
-use syn::{AttributeArgs, DeriveInput, Fields, FieldsNamed, parse_macro_input, parse_quote, Type};
+use quote::{quote};
+use syn::{DeriveInput, Fields, FieldsNamed, parse_macro_input, parse_quote, Type};
 
 mod db_meta;
 mod cr;
@@ -62,7 +63,7 @@ mod cr;
 #[proc_macro_attribute]
 pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
     let mut ast = parse_macro_input!(input as DeriveInput);
-    let args = parse_macro_input!(args as AttributeArgs);
+    // let args = parse_macro_input!(args as AttributeArgs);
 
     // Append the fields.
     let fields_additional: FieldsNamed = parse_quote!({
@@ -76,7 +77,11 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
     ast.append_named(fields_additional);
 
     let name = &ast.ident;
-
+    let table_name: proc_macro2::TokenStream = {
+        let mut t = to_snake_name(&name.to_string());
+        t = format!("\"{}\".to_owned()", t);
+        t.parse().unwrap()
+    };
     let imp_base = quote! {
         impl Shared for #name {
             fn get_id(&self) -> String { self.id.clone() }
@@ -95,25 +100,17 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
             fn set_update_time(&mut self, update_time: i64) {
                 self.update_time = update_time;
             }
-        }
-    };
 
-    let impl_crud = if args.is_empty() {
-        quote! {}
-    } else {
-        quote! {
-            impl CRUDTable for #name {
-                type IdType = String;
-                fn get_id(&self) ->  Option<&Self::IdType>{
-                    if self.id.is_empty() {
-                        None
-                    }else{
-                        Some(&self.id)
-                    }
-                }
+            fn table_name() -> String {
+                #table_name
             }
         }
     };
+
+    let impl_crud = quote! {
+        // rbatis::crud!(MEeeChainTokenShared);
+    };
+
 
     let fields_stream = db_field_name(&ast.ident, &ast.fields());
     let gen = TokenStream::from(quote! {
@@ -123,7 +120,7 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
             #impl_crud
         });
     if cfg!(feature = "print_macro") {
-        println!("\n............gen impl db_append_shared {}:\n {}", name, gen);
+        println!("\n............gen impl db_append_shared {}:\n {}\n", name, gen);
     }
     // if name.to_string() == "MMnemonic"{
     //     println!("\n............gen impl db_append_shared {}:\n {}", name, gen);
@@ -200,7 +197,7 @@ pub fn db_before_save(input: TokenStream) -> TokenStream {
         }
     };
     if cfg!(feature = "print_macro") {
-        println!("\n............gen impl DbBeforeSave {}:\n {}", name, gen);
+        println!("\n............gen impl DbBeforeSave {}:\n {}\n", name, gen);
     }
     gen.into()
 }
@@ -218,7 +215,7 @@ pub fn db_before_update(input: TokenStream) -> TokenStream {
         }
     };
     if cfg!(feature = "print_macro") {
-        println!("\n............gen impl DbBeforeUpdate {}:\n {}", name, gen);
+        println!("\n............gen impl DbBeforeUpdate {}:\n {}\n", name, gen);
     }
     gen.into()
 }
@@ -251,7 +248,7 @@ pub fn dl_struct(input: TokenStream) -> TokenStream {
             }
         });
     if cfg!(feature = "print_macro") {
-        println!("\n............gen impl dl_struct {}:\n {}", name, gen);
+        println!("\n............gen impl dl_struct {}:\n {}\n", name, gen);
     }
     gen
 }
@@ -287,7 +284,7 @@ pub fn dl_default(input: TokenStream) -> TokenStream {
             }
         });
     if cfg!(feature = "print_macro") {
-        println!("............gen impl dl_default {}:\n {}", name, gen);
+        println!("............gen impl dl_default {}:\n {}\n", name, gen);
     }
     gen
 }
@@ -313,7 +310,7 @@ pub fn dl_drop(input: TokenStream) -> TokenStream {
             }
         });
     if cfg!(feature = "print_macro") {
-        println!("............gen impl dl_drop {}:\n {}", name, gen);
+        println!("............gen impl dl_drop {}:\n {}\n", name, gen);
     }
     gen
 }

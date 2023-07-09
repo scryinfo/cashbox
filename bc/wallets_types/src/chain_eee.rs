@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use rbatis::crud::CRUDTable;
+// use rbatis::crud::CRUDTable;
 use rbatis::rbatis::Rbatis;
 
 use mav::{ChainType, CTrue, NetType, WalletType};

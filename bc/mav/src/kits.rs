@@ -1,9 +1,13 @@
 use std::{fmt, fs, io, path};
 use std::ops::Add;
 use std::sync::Arc;
+use log::LevelFilter;
+use rbatis::dark_std::sync::SyncVec;
+use rbatis::intercept::Intercept;
+use rbatis::intercept_log::LogInterceptor;
 
-use rbatis::plugin::log::{LogPlugin, RbatisLogPlugin};
-use rbatis::rbatis::{Rbatis, RbatisOption};
+// use rbatis::plugin::log::{LogPlugin, RbatisLogPlugin};
+use rbatis::rbatis::{RBatis, RBatisOption};
 use uuid::Uuid;
 
 #[derive(Debug, PartialEq, Clone, Default)]
@@ -18,8 +22,8 @@ impl fmt::Display for Error {
     }
 }
 
-impl From<rbatis_core::Error> for Error {
-    fn from(e: rbatis_core::Error) -> Self { Error::from(e.to_string().as_str()) }
+impl From<rbatis::Error> for Error {
+    fn from(e: rbatis::Error) -> Self { Error::from(e.to_string().as_str()) }
 }
 
 impl From<&str> for Error {
@@ -40,7 +44,7 @@ pub fn now_ts_seconds() -> i64 {
 
 /// 如果数据库文件不存在，则创建它
 /// 如果连接出错直接panic
-pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, Error> {
+pub async fn make_rbatis(db_file_name: &str) -> Result<RBatis, Error> {
     if fs::metadata(db_file_name).is_err() {
         let file = path::Path::new(db_file_name);
         let dir = file.parent();
@@ -51,31 +55,33 @@ pub async fn make_rbatis(db_file_name: &str) -> Result<Rbatis, Error> {
         fs::create_dir_all(dir)?;
         fs::File::create(db_file_name)?;
     }
-    let rb = Rbatis::new();
+    let rb = RBatis::new();
     let url = "sqlite://".to_owned().add(db_file_name);
-    rb.link(url.as_str()).await?;
+    rb.link(rbdc_sqlite::driver::SqliteDriver {},url.as_str()).await?;
     return Ok(rb);
 }
 
-pub async fn make_memory_rbatis() -> Result<Rbatis, Error> {
+pub async fn make_memory_rbatis() -> Result<RBatis, Error> {
     let rb = {
-        let op = RbatisOption {
-            log_plugin: Arc::new(Box::new(RbatisLogPlugin {
-                level_filter: log::max_level(),
-            }) as Box<dyn LogPlugin>),
-            ..RbatisOption::default()
+        let op = RBatisOption {
+            intercepts: {
+                let intercepts = SyncVec::new();
+                intercepts
+                    .push(Arc::new(LogInterceptor::new(LevelFilter::Debug)) as Arc<dyn Intercept>);
+                intercepts
+            }
         };
-        Rbatis::new_with_opt(op)
+        RBatis::new_with_opt(op)
     };
     let url = "sqlite://:memory:".to_owned();
-    rb.link(&url).await?;
+    rb.link( rbdc_sqlite::driver::SqliteDriver {}, &url).await?;
     return Ok(rb);
 }
 
 #[cfg(test)]
 pub mod test {
     use futures::executor::block_on;
-    use rbatis::rbatis::Rbatis;
+    use rbatis::rbatis::RBatis;
 
     use crate::kits::make_memory_rbatis;
     use crate::ma::{Db, DbName};
@@ -94,7 +100,7 @@ pub mod test {
         db
     }
 
-    pub async fn make_memory_rbatis_test() -> Rbatis {
+    pub async fn make_memory_rbatis_test() -> RBatis {
         struct SimpleLogger;
 
         impl log::Log for SimpleLogger {

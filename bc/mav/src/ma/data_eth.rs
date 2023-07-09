@@ -1,7 +1,7 @@
 use std::fmt;
 
-use rbatis::crud::CRUDTable;
-use rbatis_macro_driver::CRUDTable;
+// use rbatis::crud::CRUDTable;
+// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
@@ -16,7 +16,7 @@ use crate::ma::TxShared;
 
 /// eth链的token
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainToken {
     #[serde(default)]
     pub next_id: String,
@@ -48,7 +48,7 @@ impl MEthChainToken {
 }
 
 /// eth chain的交易，包含eth，erc20等
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthChainTx {
     #[serde(flatten)]
@@ -135,7 +135,7 @@ impl fmt::Display for EthErc20Face {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MEthErc20Tx {
     #[serde(default)]
     pub eth_chain_tx_id: String,

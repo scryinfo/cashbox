@@ -1,4 +1,5 @@
-use rbatis_macro_driver::CRUDTable;
+// use rbatis_macro_driver::CRUDTable;
+use rbatis::crud;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -13,7 +14,7 @@ use crate::ma::MWallet;
 //删除钱包时软件删除
 //功能是作为备份使用，如果Wallet表中的数据无法读取时，才起用此表 ,CRUDTable
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MMnemonic {
     #[serde(default)]
     pub mnemonic_digest: String,
@@ -24,6 +25,7 @@ pub struct MMnemonic {
     #[serde(default)]
     pub name: String,
 }
+crud!(MMnemonic{});
 
 impl MMnemonic {
     pub const fn create_table_script() -> &'static str {

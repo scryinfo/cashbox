@@ -1,5 +1,5 @@
-use rbatis::crud::CRUDTable;
-use rbatis_macro_driver::CRUDTable;
+// use rbatis::crud::CRUDTable;
+// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 
@@ -11,7 +11,7 @@ use crate::ma::TxShared;
 
 //btc
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainToken {
     #[serde(default)]
     pub next_id: String,
@@ -40,7 +40,7 @@ impl MBtcChainToken {
     }
 }
 
-#[db_append_shared(CRUDTable)]
+#[db_append_shared()]
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcChainTx {
     #[serde(flatten)]
@@ -66,7 +66,7 @@ impl MBtcChainTx {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcInputTx {
     #[serde(default)]
     pub btc_chain_tx_foreign: String,
@@ -98,7 +98,7 @@ impl MBtcInputTx {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default,  DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcOutputTx {
     #[serde(default)]
     pub btc_chain_tx_foreign: String,
@@ -123,7 +123,7 @@ impl MBtcOutputTx {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcUtxo {
     #[serde(default)]
     // satoshi 已花费的交易才有交易费
@@ -152,7 +152,7 @@ impl MBtcUtxo {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBlockHeader {
     #[serde(default)]
     pub header: String,

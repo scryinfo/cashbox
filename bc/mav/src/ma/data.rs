@@ -1,4 +1,4 @@
-use rbatis_macro_driver::CRUDTable;
+// use rbatis_macro_driver::CRUDTable;
 use serde::{Deserialize, Serialize};
 
 use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdate};
@@ -9,7 +9,7 @@ use crate::ma::dao::{self, Shared};
 /// 地址与token对应的balance
 #[allow(non_upper_case_globals)]
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MTokenAddress {
     #[serde(default)]
     pub wallet_id: String,

@@ -1,14 +1,15 @@
 use std::ops::Add;
 
 use lazy_static::lazy_static;
-use rbatis::crud::CRUDTable;
-use rbatis::rbatis::Rbatis;
+// use rbatis::crud::CRUDTable;
+use rbatis::rbatis::RBatis;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
+use crate::ma::dao::Shared;
 use crate::{CTrue, kits, NetType};
 use crate::kits::Error;
-use crate::ma::{BtcTokenType, Dao, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenNonAuth, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MTokenShared, MWallet};
+use crate::ma::{BtcTokenType, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenNonAuth, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MTokenShared, MWallet};
 
 /// Note that cashbox is currently on version 1. Version 2 is this version,
 /// when cashbox want to update version we must synchronize this database version value;
@@ -166,18 +167,18 @@ pub enum DbCreateType {
 
 #[derive(Default)]
 pub struct Db {
-    cashbox_wallets: Rbatis,
-    cashbox_mnemonic: Rbatis,
-    wallet_mainnet: Rbatis,
-    wallet_private: Rbatis,
-    wallet_testnet: Rbatis,
-    wallet_testnet_private: Rbatis,
+    cashbox_wallets: RBatis,
+    cashbox_mnemonic: RBatis,
+    wallet_mainnet: RBatis,
+    wallet_private: RBatis,
+    wallet_testnet: RBatis,
+    wallet_testnet_private: RBatis,
     pub db_name: DbName,
 }
 
 impl Db {
     ///链数据的数据据库
-    pub fn data_db(&self, net_type: &NetType) -> &Rbatis {
+    pub fn data_db(&self, net_type: &NetType) -> &RBatis {
         match net_type {
             NetType::Main => &self.wallet_mainnet,
             NetType::Test => &self.wallet_testnet,
@@ -186,11 +187,11 @@ impl Db {
         }
     }
     ///钱包名等信息的数据库
-    pub fn wallets_db(&self) -> &Rbatis {
+    pub fn wallets_db(&self) -> &RBatis {
         &self.cashbox_wallets
     }
     ///助记词的数据库
-    pub fn mnemonic_db(&self) -> &Rbatis {
+    pub fn mnemonic_db(&self) -> &RBatis {
         &self.cashbox_mnemonic
     }
 
@@ -217,9 +218,9 @@ impl Db {
     }
     pub async fn init_tables(&self, create_type: &DbCreateType) -> Result<(), Error> {
         let wallets_rb = self.wallets_db();
-        let user_version: i64 = wallets_rb.fetch("", "PRAGMA user_version").await?;
+        let user_version: i64 = wallets_rb.query_decode("PRAGMA user_version",vec![]).await?;
         if user_version == 0 {
-            wallets_rb.exec("", &SET_VERSION_SQL).await?;
+            wallets_rb.exec(&SET_VERSION_SQL, vec![]).await?;
             self.create(create_type).await?;
             Db::insert_chain_token(self).await?;
             return Ok(());
@@ -257,31 +258,31 @@ impl Db {
 
         Ok(())
     }
-    pub async fn create_table(rb: &Rbatis, sql: &str, name: &str, create_type: &DbCreateType) -> Result<(), Error> {
+    pub async fn create_table(rb: &RBatis, sql: &str, name: &str, create_type: &DbCreateType) -> Result<(), Error> {
         match create_type {
             DbCreateType::NotExists => {
-                rb.exec("", sql).await?;
+                rb.exec(sql,vec![]).await?;
             }
             DbCreateType::CleanData => {
-                rb.exec("", sql).await?;
-                rb.exec("", &format!("delete from {};", name)).await?;
+                rb.exec( sql,vec![]).await?;
+                rb.exec(&format!("delete from {};", name),vec![]).await?;
             }
             DbCreateType::Drop => {
-                rb.exec("", &format!("drop table if exists {};", name))
+                rb.exec(&format!("drop table if exists {};", name), vec![])
                     .await?;
-                rb.exec("", sql).await?;
+                rb.exec( sql, vec![]).await?;
             }
         }
         Ok(())
     }
 
-    pub async fn create_table_mnemonic(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
+    pub async fn create_table_mnemonic(rb: &RBatis, create_type: &DbCreateType) -> Result<(), Error> {
         Db::create_table(rb, MMnemonic::create_table_script(), &MMnemonic::table_name(), create_type).await?;
         Ok(())
     }
 
     ///total: 16
-    pub async fn create_table_wallets(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
+    pub async fn create_table_wallets(rb: &RBatis, create_type: &DbCreateType) -> Result<(), Error> {
         Db::create_table(rb, MWallet::create_table_script(), &MWallet::table_name(), create_type).await?;
         Db::create_table(rb, MChainTypeMeta::create_table_script(), &MChainTypeMeta::table_name(), create_type).await?;
         Db::create_table(rb, MAddress::create_table_script(), &MAddress::table_name(), create_type).await?;
@@ -299,7 +300,7 @@ impl Db {
         Ok(())
     }
     ///total: 12
-    pub async fn create_table_data(rb: &Rbatis, create_type: &DbCreateType) -> Result<(), Error> {
+    pub async fn create_table_data(rb: &RBatis, create_type: &DbCreateType) -> Result<(), Error> {
         Db::create_table(rb, MTokenAddress::create_table_script(), &MTokenAddress::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainToken::create_table_script(), &MEthChainToken::table_name(), create_type).await?;
         Db::create_table(rb, MEthChainTx::create_table_script(), &MEthChainTx::table_name(), create_type).await?;
@@ -485,7 +486,7 @@ impl Db {
 #[cfg(test)]
 mod tests {
     use futures::executor::block_on;
-    use rbatis::rbatis::Rbatis;
+    use rbatis::rbatis::RBatis;
     use strum::IntoEnumIterator;
 
     use crate::ma::{Db, DbName, DbNameType};
@@ -569,28 +570,28 @@ mod tests {
         assert_eq!(false, re.is_err(), "{:?}", re);
 
         assert_eq!(
-            &db.cashbox_wallets as *const Rbatis,
-            db.wallets_db() as *const Rbatis
+            &db.cashbox_wallets as *const RBatis,
+            db.wallets_db() as *const RBatis
         );
         assert_eq!(
-            &db.cashbox_mnemonic as *const Rbatis,
-            db.mnemonic_db() as *const Rbatis
+            &db.cashbox_mnemonic as *const RBatis,
+            db.mnemonic_db() as *const RBatis
         );
         assert_eq!(
-            &db.wallet_mainnet as *const Rbatis,
-            db.data_db(&NetType::Main) as *const Rbatis
+            &db.wallet_mainnet as *const RBatis,
+            db.data_db(&NetType::Main) as *const RBatis
         );
         assert_eq!(
-            &db.wallet_testnet as *const Rbatis,
-            db.data_db(&NetType::Test) as *const Rbatis
+            &db.wallet_testnet as *const RBatis,
+            db.data_db(&NetType::Test) as *const RBatis
         );
         assert_eq!(
-            &db.wallet_private as *const Rbatis,
-            db.data_db(&NetType::Private) as *const Rbatis
+            &db.wallet_private as *const RBatis,
+            db.data_db(&NetType::Private) as *const RBatis
         );
         assert_eq!(
-            &db.wallet_testnet_private as *const Rbatis,
-            db.data_db(&NetType::PrivateTest) as *const Rbatis
+            &db.wallet_testnet_private as *const RBatis,
+            db.data_db(&NetType::PrivateTest) as *const RBatis
         );
     }
 }

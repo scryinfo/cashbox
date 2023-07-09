@@ -1,4 +1,4 @@
-use rbatis_macro_driver::CRUDTable;
+// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
@@ -10,7 +10,7 @@ use crate::ma::dao::{self, Shared};
 
 /// 动态库自己的配置，并不指app的配置
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, CRUDTable, DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MSetting {
     #[serde(default)]
     pub key_str: String,

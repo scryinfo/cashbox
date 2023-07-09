@@ -10,10 +10,10 @@ cd dl/arm64-v8a
 outPath=$(pwd)
 
 TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
-export AR=$TOOLCHAIN/bin/${HOST_TAG}-ar
-export CC=$TOOLCHAIN/bin/${HOST_TAG}28-clang
-export CXX=$TOOLCHAIN/bin/${HOST_TAG}28-clang++
-export LINKER=$TOOLCHAIN/bin/${HOST_TAG}28-clang
+export AR=$TOOLCHAIN/bin/llvm-ar
+export CC=$TOOLCHAIN/bin/${HOST_TAG}33-clang
+export CXX=$TOOLCHAIN/bin/${HOST_TAG}33-clang++
+export LINKER=$TOOLCHAIN/bin/${HOST_TAG}33-clang
 export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$LINKER
 
 #rustup default stable-gnu
