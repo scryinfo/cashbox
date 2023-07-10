@@ -1,16 +1,15 @@
 use std::ops::Add;
 
 use lazy_static::lazy_static;
-// use rbatis::crud::CRUDTable;
 use rbatis::rbatis::RBatis;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::ma::dao::Shared;
 use crate::{CTrue, kits, NetType};
 use crate::kits::Error;
 use crate::ma::{BtcTokenType, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenNonAuth, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MTokenShared, MWallet};
 use crate::ma::dao::BeforeSave;
+use crate::ma::dao::Shared;
 
 /// Note that cashbox is currently on version 1. Version 2 is this version,
 /// when cashbox want to update version we must synchronize this database version value;
@@ -219,7 +218,7 @@ impl Db {
     }
     pub async fn init_tables(&self, create_type: &DbCreateType) -> Result<(), Error> {
         let wallets_rb = self.wallets_db();
-        let user_version: i64 = wallets_rb.query_decode("PRAGMA user_version",vec![]).await?;
+        let user_version: i64 = wallets_rb.query_decode("PRAGMA user_version", vec![]).await?;
         if user_version == 0 {
             wallets_rb.exec(&SET_VERSION_SQL, vec![]).await?;
             self.create(create_type).await?;
@@ -262,16 +261,16 @@ impl Db {
     pub async fn create_table(rb: &RBatis, sql: &str, name: &str, create_type: &DbCreateType) -> Result<(), Error> {
         match create_type {
             DbCreateType::NotExists => {
-                rb.exec(sql,vec![]).await?;
+                rb.exec(sql, vec![]).await?;
             }
             DbCreateType::CleanData => {
-                rb.exec( sql,vec![]).await?;
-                rb.exec(&format!("delete from {};", name),vec![]).await?;
+                rb.exec(sql, vec![]).await?;
+                rb.exec(&format!("delete from {};", name), vec![]).await?;
             }
             DbCreateType::Drop => {
                 rb.exec(&format!("drop table if exists {};", name), vec![])
                     .await?;
-                rb.exec( sql, vec![]).await?;
+                rb.exec(sql, vec![]).await?;
             }
         }
         Ok(())
@@ -350,14 +349,8 @@ impl Db {
             {
                 //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb.new_wrapper()
-                        .eq(
-                            MEthChainTokenDefault::chain_token_shared_id,
-                            token_shared.id.clone(),
-                        )
-                        .eq(MEthChainTokenDefault::net_type, net_type.to_string());
-                    let old = MEthChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
-                    if !old {
+                    let old = MEthChainTokenDefault::select_token_shared_id_and_net_type(&mut rb, &token_shared.id, &net_type.to_string()).await?;
+                    if old.is_none() {
                         let mut token_default = MEthChainTokenDefault {
                             chain_token_shared_id: token_shared.id.clone(),
                             net_type: net_type.to_string(),
@@ -365,14 +358,15 @@ impl Db {
                             status: CTrue as i64,
                             ..Default::default()
                         };
-                        token_default.save(rb, "").await?;
+                        token_default.before_save();
+                        MEthChainTokenDefault::insert(&mut rb, &token_default).await?;
                     }
                 }
             }
         }
         {
             //eee
-            let rb = db.wallets_db();
+            let mut rb = db.wallets_db();
             let token_shared = {
                 let mut eee = MEeeChainTokenShared {
                     token_type: EeeTokenType::Eee.to_string(),
@@ -389,43 +383,36 @@ impl Db {
                 };
 
                 let old_eth = {
-                    let wrapper = rb
-                        .new_wrapper()
-                        .eq(MEeeChainTokenShared::token_type, &eee.token_type);
-                    MEeeChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
+                    MEeeChainTokenShared::select_by_token_type(&mut rb, &eee.token_type).await?
                 };
                 if let Some(t) = old_eth {
                     eee = t;
                 } else {
-                    eee.save(rb, "").await?;
+                    eee.before_save();
+                    MEeeChainTokenShared::insert(&mut rb, &eee).await?;
                 }
                 eee
             };
             {
                 //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb.new_wrapper()
-                        .eq(
-                            MEeeChainTokenDefault::chain_token_shared_id,
-                            token_shared.id.clone(),
-                        )
-                        .eq(MEeeChainTokenDefault::net_type, net_type.to_string());
-                    let old = MEeeChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
-                    if !old {
+                    let old = MEeeChainTokenDefault::select_by_token_shared_id_and_net_type(&mut rb, &token_shared.id, &net_type.to_string()).await?;
+                    if old.is_none() {
                         let mut token_default = MEeeChainTokenDefault {
                             chain_token_shared_id: token_shared.id.clone(),
                             net_type: net_type.to_string(),
                             status: CTrue as i64,
                             ..Default::default()
                         };
-                        token_default.save(rb, "").await?;
+                        token_default.before_save();
+                        MEeeChainTokenDefault::insert(&mut rb, &token_default).await?;
                     }
                 }
             }
         }
         {
             //btc
-            let rb = db.wallets_db();
+            let mut rb = db.wallets_db();
             let token_shared = {
                 let mut btc = MBtcChainTokenShared {
                     token_type: BtcTokenType::Btc.to_string(),
@@ -443,28 +430,21 @@ impl Db {
                 };
 
                 let old_eth = {
-                    let wrapper = rb.new_wrapper()
-                        .eq(MBtcChainTokenShared::token_type, &btc.token_type);
-                    MBtcChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
+                    MBtcChainTokenShared::select_by_token_type(&mut rb, &btc.token_type).await?
                 };
                 if let Some(t) = old_eth {
                     btc = t;
                 } else {
-                    btc.save(rb, "").await?;
+                    btc.before_save();
+                    MBtcChainTokenShared::insert(&mut rb, &btc).await?;
                 }
                 btc
             };
             {
                 //token_default
                 for net_type in NetType::iter() {
-                    let wrapper = rb.new_wrapper()
-                        .eq(
-                            MBtcChainTokenDefault::chain_token_shared_id,
-                            token_shared.id.clone(),
-                        )
-                        .eq(MBtcChainTokenDefault::net_type, net_type.to_string());
-                    let old = MBtcChainTokenDefault::exist_by_wrapper(rb, "", &wrapper).await?;
-                    if !old {
+                    let old = MBtcChainTokenDefault::select_by_token_shared_id_and_net_type(&mut rb, &token_shared.id, &net_type.to_string()).await?;
+                    if old.is_none() {
                         let mut token_default = MBtcChainTokenDefault {
                             net_type: net_type.to_string(),
                             chain_token_shared_id: token_shared.id.clone(),
@@ -472,7 +452,8 @@ impl Db {
                             status: CTrue as i64,
                             ..Default::default()
                         };
-                        token_default.save(rb, "").await?;
+                        token_default.before_save();
+                        MBtcChainTokenDefault::insert(&mut rb, &token_default).await?;
                     }
                 }
             }

@@ -18,7 +18,7 @@ pub enum WalletError {
     ScaleCodec(codec::Error),
     Secp256k1(secp256k1::Error),
     NoneError(String),
-    RbatisError(rbatis_core::error::Error),
+    RbatisError(rbatis::error::Error),
     NotExist,
     BtcTx(btc::Error),
 }
@@ -154,8 +154,8 @@ impl From<eee::error::Error> for WalletError {
 //     }
 // }
 
-impl From<rbatis_core::error::Error> for WalletError {
-    fn from(err: rbatis_core::error::Error) -> Self {
+impl From<rbatis::error::Error> for WalletError {
+    fn from(err: rbatis::error::Error) -> Self {
         WalletError::RbatisError(err)
     }
 }

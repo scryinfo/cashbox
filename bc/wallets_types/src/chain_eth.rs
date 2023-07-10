@@ -1,11 +1,12 @@
 use async_trait::async_trait;
-// use rbatis::crud::CRUDTable;
 
 use mav::{ChainType, CTrue, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenNonAuth, MEthChainTokenShared, MTokenShared, MWallet};
+use mav::ma::{MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenNonAuth, MEthChainTokenShared, MTokenShared, MWallet, Shared};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
+
+// use rbatis::crud::CRUDTable;
 
 #[derive(Debug, Default)]
 pub struct EthChainToken {
@@ -258,15 +259,12 @@ impl EthChain {
         }
         {//load token
 
-            let rb = context.db().data_db(&net_type);
-            let wrapper = rb.new_wrapper()
-                .eq(MEthChainToken::wallet_id, mw.id.clone())
-                .eq(MEthChainToken::chain_type, chain_type);
-            let ms = MEthChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
-            self.tokens.clear();
-            for it in ms {
+            let mut rb = context.db().data_db(&net_type);
+            let w = MEthChainToken::select_by_wallet_id_and_chain_type(&mut rb, &mw.id, &chain_type).await?;
+            if let Some(w) = w {
+                self.tokens.clear();
                 let mut token = EthChainToken::default();
-                token.load(context, it).await?;
+                token.load(context, w).await?;
                 self.tokens.push(token);
             }
         }

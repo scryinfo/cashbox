@@ -1,9 +1,7 @@
-// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 
 use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
@@ -28,6 +26,11 @@ pub struct MWallet {
     #[serde(default)]
     pub show: u32,
 }
+rbatis::crud!(MWallet{});
+rbatis::impl_select!(MWallet{select_by_wallet_type(wallet_type:&str)
+    => "`where wallet_type= #{wallet_type}`"});
+rbatis::impl_select!(MWallet{select_by_mnemonic_digest_and_wallet_type(mnemonic_digest:&str, wallet_type:&str)
+    => "`where mnemonic_digest = #{mnemonic_digest} and wallet_type= #{wallet_type}`"});
 
 impl MWallet {
     pub const fn create_table_script() -> &'static str {
@@ -73,6 +76,10 @@ pub struct MAddress {
     #[serde(default)]
     pub show: u32,
 }
+
+rbatis::crud!(MAddress{});
+rbatis::impl_select!(MAddress{select_by_wallet_id_and_chain_type(wallet_id:&str,chain_type: &str)->
+    Option => "`where wallet_id= #{wallet_id} and chain_type= #{chain_type} limit 1`"});
 
 impl MAddress {
     pub const fn create_table_script() -> &'static str {

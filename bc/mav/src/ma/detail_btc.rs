@@ -1,11 +1,8 @@
-// use rbatis::crud::CRUDTable;
-// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
@@ -54,6 +51,10 @@ pub struct MBtcChainTokenShared {
 
 }
 
+rbatis::crud!(MBtcChainTokenShared{});
+rbatis::impl_select!(MBtcChainTokenShared{select_by_token_type(token_type:&str)->
+    Option => "'where token_type = #{token_type}'"});
+
 impl MBtcChainTokenShared {
     pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_btc_chain_token_shared.sql")
@@ -98,6 +99,15 @@ pub struct MBtcChainTokenDefault {
     #[serde(skip)]
     pub chain_token_shared: MBtcChainTokenShared,
 }
+// let wrapper = rb.new_wrapper()
+// .eq(
+// MBtcChainTokenDefault::chain_token_shared_id,
+// token_shared.id.clone(),
+// )
+// .eq(MBtcChainTokenDefault::net_type, net_type.to_string());
+rbatis::crud!(MBtcChainTokenDefault{});
+rbatis::impl_select!(MBtcChainTokenDefault{select_by_token_shared_id_and_net_type(shared_id:&str, net_type:&str)->
+    Option => "`where chain_token_shared_id = #{shared_id} and net_type = #{net_type}`"});
 
 impl MBtcChainTokenDefault {
     pub const fn create_table_script() -> &'static str {

@@ -1,11 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use dao::Shared;
 use wallets_macro::{db_append_shared, db_sub_struct, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 mod dao {
-    use async_trait::async_trait;
-
     pub trait Shared {
         fn get_id(&self) -> String;
         fn set_id(&mut self, id: String);
@@ -33,6 +31,7 @@ mod dao {
     //     async fn insert_batch(rb: &mut dyn rbatis::executor::Executor, ms: &[T]) -> RBatisExResult;
     // }
 }
+
 mod kits {
     use rbatis::rbdc::uuid::Uuid;
 
@@ -45,11 +44,10 @@ mod kits {
     }
 }
 
-use dao::{Shared};
 //
 #[db_append_shared()]
-#[derive(Serialize, Deserialize, Debug, Default,Clone, DbBeforeSave, DbBeforeUpdate)]
-struct Big {
+#[derive(Serialize, Deserialize, Debug, Default, Clone, DbBeforeSave, DbBeforeUpdate)]
+pub struct Big {
     #[serde(default)]
     pub name: String,
     #[serde(flatten)]
@@ -59,8 +57,8 @@ struct Big {
 }
 
 #[db_sub_struct]
-#[derive(Serialize, Deserialize, Debug, Default,Clone)]
-struct Sub {
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+pub struct Sub {
     #[serde(default)]
     pub count: u64,
 }

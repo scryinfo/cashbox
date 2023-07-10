@@ -4,7 +4,7 @@ use rbatis::rbatis::Rbatis;
 
 use mav::{ChainType, CTrue, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{Dao, MAccountInfoSyncProg, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MSubChainBasicInfo, MWallet};
+use mav::ma::{MAccountInfoSyncProg, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MSubChainBasicInfo, MWallet};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
@@ -173,15 +173,12 @@ impl EeeChain {
         }
 
         {//load token
-            let rb = context.db().data_db(&net_type);
-            let wrapper = rb.new_wrapper()
-                .eq(MEeeChainToken::wallet_id, mw.id.clone())
-                .eq(MEeeChainToken::chain_type, chain_type);
-            let ms = MEeeChainToken::list_by_wrapper(&rb, "", &wrapper).await?;
-            self.tokens.clear();
-            for it in ms {
+            let mut rb = context.db().data_db(&net_type);
+            let w = MEeeChainToken::select_by_wallet_id_and_chain_type(&mut rb, &mw.id, &chain_type).await?;
+            if let Some(w) = w {
+                self.tokens.clear();
                 let mut token = EeeChainToken::default();
-                token.load(context, it).await?;
+                token.load(context, w).await?;
                 self.tokens.push(token);
             }
         }

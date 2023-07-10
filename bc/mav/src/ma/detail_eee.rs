@@ -1,13 +1,10 @@
-// use rbatis::crud::CRUDTable;
 use rbatis::crud;
 use rbs;
-// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
@@ -61,6 +58,12 @@ pub struct MEeeChainTokenShared {
     pub decimal: i32,
 }
 
+rbatis::crud!(MEeeChainTokenShared{});
+// let wrapper = rb
+// .new_wrapper()
+// .eq(MEeeChainTokenShared::token_type, &eee.token_type);
+rbatis::impl_select!(MEeeChainTokenShared{select_by_token_type(token_type: &str)->Option =>"where token_type = #{token_type} limit 1"});
+
 impl MEeeChainTokenShared {
     pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_eee_chain_token_shared.sql")
@@ -106,6 +109,10 @@ pub struct MEeeChainTokenDefault {
     #[serde(skip)]
     pub chain_token_shared: MEeeChainTokenShared,
 }
+
+rbatis::crud!(MEeeChainTokenDefault{});
+rbatis::impl_select!(MEeeChainTokenDefault{select_by_token_shared_id_and_net_type(shared_id:&str,net_type: &str)->
+    Option =>"`where chain_token_shared_id = #{shared_id} and net_type = #{net_type} limit 1`"});
 
 impl MEeeChainTokenDefault {
     pub const fn create_table_script() -> &'static str {

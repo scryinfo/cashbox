@@ -1,13 +1,11 @@
-// use rbatis_macro_driver::CRUDTable;
 use rbatis::crud;
 use serde::Deserialize;
 use serde::Serialize;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 use crate::kits;
-use crate::ma::dao::{self, Shared,RBatisExResult};
+use crate::ma::dao::{self, Shared};
 use crate::ma::MWallet;
 
 //导入/创建钱包时生成

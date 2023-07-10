@@ -20,16 +20,12 @@ rustfmt = "0.10.0"
 bigdecimal = { version = "0.3.1", package = "bigdecimal", features = ["serde"] }
 
 [dev-dependencies]
-#, features = ["async-io-sqlite"]
 rbatis = { version = "4.3"}
 rbs = "4.3"
 serde = { version = "1", features = ["derive"] }
-async-trait = "0.1.68"
 chrono = "0.4.26"
 
-#mav = {path="../mav"}
-
 [features]
-default = ["print_macro"]
+default = []
 db_meta = []
 print_macro = []

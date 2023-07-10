@@ -1,10 +1,7 @@
-// use rbatis::crud::CRUDTable;
-// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
@@ -33,6 +30,10 @@ pub struct MEeeChainToken {
     #[serde(default)]
     pub decimal: i32,
 }
+
+rbatis::crud!(MEeeChainToken{});
+rbatis::impl_select!(MEeeChainToken{select_by_wallet_id_and_chain_type(wallet_id:&str, chain_type:&str) ->
+    Option => "`where wallet_id= #{wallet_id} and chain_type= #{chain_type}`"});
 
 impl MEeeChainToken {
     pub const fn create_table_script() -> &'static str {

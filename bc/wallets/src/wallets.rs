@@ -241,7 +241,7 @@ impl Wallets {
             None => Err(WalletError::NoRecord("".to_owned())),
             Some(mut m_wallet) => {
                 m_wallet.name = name.to_owned();
-                Wallet::update_by_id(context, &mut m_wallet, tx_id).await
+                Wallet::update_by_id(context, &mut m_wallet).await
             }
         }
     }

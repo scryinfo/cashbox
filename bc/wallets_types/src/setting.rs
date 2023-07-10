@@ -1,5 +1,5 @@
 use mav::{ChainType, NetType};
-use mav::ma::{Dao, MSetting, SettingType};
+use mav::ma::{MSetting, SettingType};
 
 use crate::{ContextTrait, WalletError};
 use crate::deref_type;

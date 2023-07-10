@@ -2,7 +2,7 @@ use proc_macro::TokenStream;
 use std::str::FromStr;
 
 use proc_macro_roids::{DeriveInputStructExt, FieldsNamedAppend};
-use quote::{quote};
+use quote::quote;
 use syn::{DeriveInput, Fields, FieldsNamed, parse_macro_input, parse_quote, Type};
 
 mod db_meta;

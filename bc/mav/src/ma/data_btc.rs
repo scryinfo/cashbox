@@ -1,10 +1,7 @@
-// use rbatis::crud::CRUDTable;
-// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
@@ -34,7 +31,9 @@ pub struct MBtcChainToken {
     #[serde(default)]
     pub decimal: i32,
 }
-
+rbatis::crud!(MBtcChainToken{});
+rbatis::impl_select!(MBtcChainToken{select_by_wallet_id_and_chain_type(wallet_id:&str, chain_type:&str) ->
+    Option => "`where wallet_id = #{wallet_id} and chain_type= #{chain_type}`"});
 impl MBtcChainToken {
     pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_btc_chain_token.sql")
@@ -99,7 +98,7 @@ impl MBtcInputTx {
 }
 
 #[db_append_shared]
-#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default,  DbBeforeSave, DbBeforeUpdate)]
+#[derive(PartialEq, Serialize, Deserialize, Clone, Debug, Default, DbBeforeSave, DbBeforeUpdate)]
 pub struct MBtcOutputTx {
     #[serde(default)]
     pub btc_chain_tx_foreign: String,

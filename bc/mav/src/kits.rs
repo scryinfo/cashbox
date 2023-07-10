@@ -1,11 +1,11 @@
 use std::{fmt, fs, io, path};
 use std::ops::Add;
 use std::sync::Arc;
+
 use log::LevelFilter;
 use rbatis::dark_std::sync::SyncVec;
 use rbatis::intercept::Intercept;
 use rbatis::intercept_log::LogInterceptor;
-
 // use rbatis::plugin::log::{LogPlugin, RbatisLogPlugin};
 use rbatis::rbatis::{RBatis, RBatisOption};
 use uuid::Uuid;
@@ -57,7 +57,7 @@ pub async fn make_rbatis(db_file_name: &str) -> Result<RBatis, Error> {
     }
     let rb = RBatis::new();
     let url = "sqlite://".to_owned().add(db_file_name);
-    rb.link(rbdc_sqlite::driver::SqliteDriver {},url.as_str()).await?;
+    rb.link(rbdc_sqlite::driver::SqliteDriver {}, url.as_str()).await?;
     return Ok(rb);
 }
 
@@ -74,7 +74,7 @@ pub async fn make_memory_rbatis() -> Result<RBatis, Error> {
         RBatis::new_with_opt(op)
     };
     let url = "sqlite://:memory:".to_owned();
-    rb.link( rbdc_sqlite::driver::SqliteDriver {}, &url).await?;
+    rb.link(rbdc_sqlite::driver::SqliteDriver {}, &url).await?;
     return Ok(rb);
 }
 

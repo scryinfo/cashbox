@@ -1,5 +1,4 @@
 use mav::ma::{MAddress, MChainShared, MTokenAddress, MTokenShared, MWallet};
-use mav::ma::Dao;
 
 use crate::{ContextTrait, deref_type, WalletError};
 
@@ -11,11 +10,8 @@ deref_type!(Address,MAddress);
 
 impl Address {
     pub async fn load(&mut self, context: &dyn ContextTrait, wallet_id: &str, chain_type: &str) -> Result<(), WalletError> {
-        let wallet_rb = context.db().wallets_db();
-        let wrapper = wallet_rb.new_wrapper()
-            .eq(MAddress::wallet_id, wallet_id)
-            .eq(MAddress::chain_type, chain_type);
-        let address = MAddress::fetch_by_wrapper(&wallet_rb, "", &wrapper).await?;
+        let mut wallet_rb = context.db().wallets_db();
+        let address = MAddress::select_by_wallet_id_and_chain_type(&mut wallet_rb, wallet_id, chain_type).await?;
         if let Some(address) = address {
             self.m = address;
         }
@@ -38,11 +34,8 @@ impl ChainShared {
     }
 
     pub async fn set_addr(&mut self, context: &dyn ContextTrait, wallet_id: &str, chain_type: &str) -> Result<(), WalletError> {
-        let wallet_rb = context.db().wallets_db();
-        let wrapper = wallet_rb.new_wrapper()
-            .eq(MAddress::wallet_id, wallet_id)
-            .eq(MAddress::chain_type, chain_type);
-        let address = MAddress::fetch_by_wrapper(&wallet_rb, "", &wrapper).await?;
+        let mut wallet_rb = context.db().wallets_db();
+        let address = MAddress::select_by_wallet_id_and_chain_type(&mut wallet_rb, wallet_id, chain_type).await?;
 
         if let Some(address) = address {
             let addr = Address { m: address };

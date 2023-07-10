@@ -1,13 +1,10 @@
 use std::fmt;
 
-// use rbatis::crud::CRUDTable;
-// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
@@ -41,6 +38,9 @@ pub struct MEthChainToken {
     #[serde(default)]
     pub decimal: i32,
 }
+rbatis::crud!(MEthChainToken{});
+rbatis::impl_select!(MEthChainToken{select_by_wallet_id_and_chain_type(wallet_id:&str, chain_type:&str)->
+    Option =>"`where wallet_id= #{wallet_id} and chain_type= #{chain_type} limit 1`"});
 
 impl MEthChainToken {
     pub const fn create_table_script() -> &'static str {

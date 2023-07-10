@@ -1,6 +1,5 @@
 use mav::{NetType, WalletType};
-//use async_trait::async_trait;
-use mav::ma::{Dao, MAddress, MWallet};
+use mav::ma::{MAddress, MWallet};
 
 use crate::{BtcChain, ContextTrait, EeeChain, EthChain, WalletError};
 use crate::deref_type;
@@ -16,24 +15,21 @@ deref_type!(Wallet,MWallet);
 
 impl Wallet {
     pub async fn has_any(context: &dyn ContextTrait, net_type: &NetType) -> Result<bool, WalletError> {
-        let rb = context.db().wallets_db();
-        let wrapper = rb.new_wrapper().eq(MWallet::wallet_type, &WalletType::from(net_type).to_string());
-        let r = MWallet::exist_by_wrapper(rb, "", &wrapper).await?;
-        Ok(r)
+        let mut rb = context.db().wallets_db();
+        let ws = MWallet::select_by_wallet_type(&mut rb, &WalletType::from(net_type).to_string()).await?;
+        Ok(!ws.is_empty())
     }
     pub async fn count(context: &dyn ContextTrait, net_type: &NetType) -> Result<i64, WalletError> {
-        let rb = context.db().wallets_db();
-        let wrapper = rb.new_wrapper().eq(MWallet::wallet_type, &WalletType::from(net_type).to_string());
-        let count = MWallet::count_by_wrapper(rb, "", &wrapper).await?;
-        Ok(count)
+        let mut rb = context.db().wallets_db();
+        let ws = MWallet::select_by_wallet_type(&mut rb, &WalletType::from(net_type).to_string()).await?;
+        Ok(ws.len() as i64)
     }
 
     pub async fn all(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<Wallet>, WalletError> {
         let mut wallets = Vec::new();
-        let wallet_rb = context.db().wallets_db();
+        let mut wallet_rb = context.db().wallets_db();
         let filter_value = if NetType::Main.eq(net_type) { WalletType::Normal.to_string() } else { WalletType::Test.to_string() };
-        let wrapper = wallet_rb.new_wrapper().eq(MWallet::wallet_type, filter_value.as_str());
-        let dws = MWallet::list_by_wrapper(wallet_rb, "", &wrapper).await?;
+        let dws = MWallet::select_by_wallet_type(&mut wallet_rb, filter_value.as_str()).await?;
         for dw in &dws {
             let mut wallet = Wallet::default();
             wallet.load(context, dw.clone(), net_type).await?;
@@ -42,27 +38,26 @@ impl Wallet {
         Ok(wallets)
     }
     pub async fn m_wallet_all(context: &dyn ContextTrait) -> Result<Vec<MWallet>, WalletError> {
-        let dws = MWallet::list(context.db().wallets_db(), "").await?;
+        let dws = MWallet::select_all(&mut context.db().wallets_db()).await?;
         Ok(dws)
     }
     pub async fn find_by_id(context: &dyn ContextTrait, wallet_id: &str, net_type: &NetType) -> Result<Option<Wallet>, WalletError> {
-        let rb = context.db().wallets_db();
-        let m_wallet = MWallet::fetch_by_id(rb, "", &wallet_id.to_owned()).await?;
-        match m_wallet {
-            Some(m) => {
+        let mut rb = context.db().wallets_db();
+        let ws = MWallet::select_by_column(&mut rb, MWallet::id, wallet_id).await?;
+        match ws.as_slice() {
+            [w] => {
                 let mut wallet = Wallet::default();
-                wallet.load(context, m, net_type).await?;
+                wallet.load(context, w.clone(), net_type).await?;
                 Ok(Some(wallet))
             }
-            None => Ok(None)
+            _ => Ok(None)
         }
     }
     //todo 当一个助记词在测试链下多次使用时，会造成一个地址对应多个测试钱包
     pub async fn find_by_address(context: &dyn ContextTrait, address: &str) -> Result<Option<Wallet>, WalletError> {
-        let wallet_db = context.db().wallets_db();
+        let mut wallet_db = context.db().wallets_db();
         let m_address = {
-            let addr_wrapper = wallet_db.new_wrapper().eq(&MAddress::address, address);
-            MAddress::list_by_wrapper(wallet_db, "", &addr_wrapper).await?
+            MAddress::select_by_column(&mut wallet_db, &MAddress::address, address).await?
         };
         if m_address.is_empty() {
             return Err(WalletError::Custom(format!("wallet address {} is not exist!", address)));
@@ -72,53 +67,48 @@ impl Wallet {
         Self::find_by_id(context, &address.wallet_id.to_owned(), &NetType::from_chain_type(&address.chain_type)).await
     }
     pub async fn m_wallet_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<Option<MWallet>, WalletError> {
-        let rb = context.db().wallets_db();
-        let m_wallet = MWallet::fetch_by_id(rb, "", &wallet_id.to_owned()).await?;
-        Ok(m_wallet)
+        let mut rb = context.db().wallets_db();
+        let ws = MWallet::select_by_column(&mut rb, MWallet::id, &wallet_id.to_owned()).await?;
+        let w = ws.first().cloned();
+        Ok(w)
     }
     pub async fn remove_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<u64, WalletError> {
-        let rb = context.db().wallets_db();
-        let mut tx = rb.begin_tx_defer(false).await?;
-        let re = MWallet::remove_by_id(rb, &tx.tx_id, &wallet_id.to_owned()).await?;
+        let mut rb = context.db().wallets_db();
+        let mut tx = rb.acquire_begin().await?;
+        let re = MWallet::delete_by_column(&mut tx, MWallet::id, &wallet_id.to_owned()).await?;
         //todo 删除相关表
-        rb.commit(&tx.tx_id).await?;
-        tx.manager = None;
-        Ok(re)
+        tx.commit().await?;
+        Ok(re.rows_affected)
     }
 
     pub async fn update_by_id(context: &dyn ContextTrait, m_wallet: &mut MWallet, tx_id: &str) -> Result<u64, WalletError> {
-        let rb = context.db().wallets_db();
-        let re = m_wallet.update_by_id(rb, tx_id).await?;
+        let mut rb = context.db().wallets_db();
+        let re = MWallet::update_by_column(&mut rb, &m_wallet, MWallet::id).await?;
         //todo 其它字段怎么处理？
-        Ok(re)
+        Ok(re.rows_affected)
     }
 
     pub async fn m_wallet_by_name(context: &dyn ContextTrait, name: &str) -> Result<Vec<MWallet>, WalletError> {
-        let rb = context.db().wallets_db();
-        let wrapper = rb.new_wrapper().eq(&MWallet::name, name);
-        let dws = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
+        let mut rb = context.db().wallets_db();
+        let dws = MWallet::select_by_column(&mut rb, &MWallet::name, name).await?;
         Ok(dws)
     }
 
     pub async fn mnemonic_digest(context: &dyn ContextTrait, digest: &str) -> Result<Vec<MWallet>, WalletError> {
-        let rb = context.db().wallets_db();
-        let wrapper = rb.new_wrapper().eq(MWallet::mnemonic_digest, digest);
-        let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
+        let mut rb = context.db().wallets_db();
+        let ms = MWallet::select_by_column(&mut rb, MWallet::mnemonic_digest, digest).await?;
         Ok(ms)
     }
 
     pub async fn check_duplicate_mnemonic(context: &dyn ContextTrait, digest: &str, wallet_type: &WalletType) -> Result<Vec<MWallet>, WalletError> {
-        let rb = context.db().wallets_db();
-        let wrapper = {
-            let wrapper = rb.new_wrapper().eq(MWallet::mnemonic_digest, digest.to_owned());
+        let mut rb = context.db().wallets_db();
+        let ms = {
             if WalletType::Test.eq(wallet_type) {
-                //check test wallet mnemonic whether used in normal wallet
-                wrapper.eq(MWallet::wallet_type, WalletType::Normal.to_string())
+                MWallet::select_by_mnemonic_digest_and_wallet_type(&mut rb, &digest, &WalletType::Normal.to_string()).await?
             } else {
-                wrapper
+                MWallet::select_by_column(&mut rb, MWallet::mnemonic_digest, &digest).await?
             }
         };
-        let ms = MWallet::list_by_wrapper(rb, "", &wrapper).await?;
         Ok(ms)
     }
 }

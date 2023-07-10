@@ -1,11 +1,8 @@
-// use rbatis::crud::CRUDTable;
-// use rbatis_macro_driver::CRUDTable;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
-use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
@@ -115,6 +112,16 @@ pub struct MEthChainTokenDefault {
     #[serde(skip)]
     pub chain_token_shared: MEthChainTokenShared,
 }
+
+rbatis::crud!(MEthChainTokenDefault{});
+// let wrapper = rb.new_wrapper()
+// .eq(
+// MEthChainTokenDefault::chain_token_shared_id,
+// token_shared.id.clone(),
+// )
+// .eq(MEthChainTokenDefault::net_type, net_type.to_string());
+rbatis::impl_select!(MEthChainTokenDefault{select_token_shared_id_and_net_type(shared_id: &str, net_type: &str)->
+    Option => "`where chain_token_shared_id = #{shared_id} and net_type = #{net_type} limit 1`"});
 
 impl MEthChainTokenDefault {
     pub const fn create_table_script() -> &'static str {
