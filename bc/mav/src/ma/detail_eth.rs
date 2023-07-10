@@ -1,6 +1,7 @@
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
+use rbatis::py_sql;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
@@ -57,11 +58,38 @@ pub struct MEthChainTokenShared {
 // MEthChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
 rbatis::crud!(MEthChainTokenShared{});
 rbatis::impl_select!(MEthChainTokenShared{select_by_token_type(t : &str) -> Option => "`where token_type = #{t} limit 1`"});
+rbatis::impl_select!(MEthChainTokenShared{select_by_id(id : &str) -> Option => "`where id = #{id} limit 1`"});
 
 impl MEthChainTokenShared {
     pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_eth_chain_token_shared.sql")
     }
+
+    #[py_sql("`select a.* from m_eth_chain_token_default b left join m_eth_chain_token_shared a on b.chain_token_shared_id = a.id`
+     `where b.net_type = #{net_type}'"
+    )]
+    pub async fn list_by_net_type(
+        rb: &mut dyn rbatis::executor::Executor,
+        net_type: &str,
+    ) -> Result<Vec<MEthChainTokenShared>, rbatis::Error> {
+        rbatis::impled!()
+    }
+    #[py_sql("`select * from m_eth_chain_token_shared where id in (select id from m_eth_chain_token_auth where net_type = #{net_type} oder by create_time desc limit #{page_size} offset #{start_item})`")]
+    pub async fn select_auth_page_net_type_and_id_in(
+        rb: &mut dyn rbatis::executor::Executor,
+        net_type: &str,
+        start_item: u64, page_size: u64
+    ) -> Result<Vec<MEthChainTokenShared>, rbatis::Error> {
+        rbatis::impled!()
+    }
+    #[py_sql("`select * from m_eth_chain_token_non_auth a left join m_eth_chain_token_shared b on a.chain_token_shared_id = b.id where a.net_type = #{net_type} )`")]
+    pub async fn select_nonauth_net_type_and_id_in(
+        rb: &mut dyn rbatis::executor::Executor,
+        net_type: &str,
+    ) -> Result<Vec<MEthChainTokenShared>, rbatis::Error> {
+        rbatis::impled!()
+    }
+
 }
 
 #[db_append_shared]
@@ -84,6 +112,11 @@ pub struct MEthChainTokenAuth {
     /*    #[serde(skip)]
         pub chain_token_shared: MEthChainTokenShared,*/
 }
+rbatis::crud!(MEthChainTokenAuth{});
+rbatis::impl_select_page!(MEthChainTokenAuth{select_page_net_type_status_order_create_time(net_type:&str,status: i64) =>
+    "`where net_type= #{net_type} and = #{status} order by create_time desc`"});
+rbatis::impl_select!(MEthChainTokenAuth{select_by_shared_id_net_type_status(shared_id:&str, net_type:&str,status: i64) =>
+    "`where chain_token_shared_id= #{shared_id} net_type= #{net_type} and = #{status} order by create_time desc`"});
 
 impl MEthChainTokenAuth {
     pub const fn create_table_script() -> &'static str {
@@ -114,14 +147,15 @@ pub struct MEthChainTokenDefault {
 }
 
 rbatis::crud!(MEthChainTokenDefault{});
-// let wrapper = rb.new_wrapper()
-// .eq(
-// MEthChainTokenDefault::chain_token_shared_id,
-// token_shared.id.clone(),
-// )
-// .eq(MEthChainTokenDefault::net_type, net_type.to_string());
 rbatis::impl_select!(MEthChainTokenDefault{select_token_shared_id_and_net_type(shared_id: &str, net_type: &str)->
     Option => "`where chain_token_shared_id = #{shared_id} and net_type = #{net_type} limit 1`"});
+
+// let wrapper = wallets_db.new_wrapper()
+// .eq(MEthChainTokenDefault::net_type, net_type.to_string())
+// .order_by(true, &[MEthChainTokenDefault::position]);
+
+rbatis::impl_select!(MEthChainTokenDefault{select_by_net_type_order_position(net_type:&str)=>
+    "`where net_type= #{net_type} order by position`"});
 
 impl MEthChainTokenDefault {
     pub const fn create_table_script() -> &'static str {
@@ -146,6 +180,10 @@ pub struct MEthChainTokenNonAuth {
     /* #[serde(skip)]
      pub chain_token_shared: MEthChainTokenShared,*/
 }
+
+rbatis::crud!(MEthChainTokenNonAuth{});
+rbatis::impl_select!(MEthChainTokenNonAuth{select_net_type_status_order_position(net_type:&str, status: i64) =>
+    "`where net_type= #{net_type} and status= #{status} order by position desc`"});
 
 impl MEthChainTokenNonAuth {
     pub const fn create_table_script() -> &'static str {
