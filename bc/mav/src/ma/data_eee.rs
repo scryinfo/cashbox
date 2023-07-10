@@ -119,6 +119,12 @@ pub struct MSubChainBasicInfo {
     pub is_default: u32,
 }
 
+rbatis::crud!(MSubChainBasicInfo{});
+rbatis::impl_select!(MSubChainBasicInfo{select_genesis_hash_runtime_version_tx_version(
+    genesis_hash: &str,runtime_version:&str,tx_version: i32
+)-> Option =>
+    "`where genesis_hash= #{genesis_hash} and runtime_version= #{runtime_version} and tx_version= #{tx_version}`"});
+
 impl MSubChainBasicInfo {
     pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_sub_chain_basic_info.sql")
@@ -135,6 +141,7 @@ pub struct MAccountInfoSyncProg {
     #[serde(default)]
     pub block_hash: String,
 }
+rbatis::crud!(MAccountInfoSyncProg{});
 
 impl MAccountInfoSyncProg {
     pub const fn create_table_script() -> &'static str {

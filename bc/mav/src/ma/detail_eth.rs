@@ -1,7 +1,7 @@
+use rbatis::py_sql;
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
-use rbatis::py_sql;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
@@ -74,7 +74,7 @@ impl MEthChainTokenShared {
     }
 
     #[py_sql("`select a.* from m_eth_chain_token_default b left join m_eth_chain_token_shared a on b.chain_token_shared_id = a.id`
-     `where b.net_type = #{net_type}'"
+     ` where b.net_type = #{net_type}'"
     )]
     pub async fn list_by_net_type(
         rb: &mut dyn rbatis::executor::Executor,
@@ -86,7 +86,7 @@ impl MEthChainTokenShared {
     pub async fn select_auth_page_net_type_and_id_in(
         rb: &mut dyn rbatis::executor::Executor,
         net_type: &str,
-        start_item: u64, page_size: u64
+        start_item: u64, page_size: u64,
     ) -> Result<Vec<MEthChainTokenShared>, rbatis::Error> {
         rbatis::impled!()
     }
@@ -97,7 +97,6 @@ impl MEthChainTokenShared {
     ) -> Result<Vec<MEthChainTokenShared>, rbatis::Error> {
         rbatis::impled!()
     }
-
 }
 
 #[db_append_shared]

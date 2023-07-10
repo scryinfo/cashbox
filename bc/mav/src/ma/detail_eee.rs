@@ -1,4 +1,4 @@
-use rbatis::crud;
+use rbatis::py_sql;
 use rbs;
 use serde::Deserialize;
 use serde::Serialize;
@@ -59,14 +59,30 @@ pub struct MEeeChainTokenShared {
 }
 
 rbatis::crud!(MEeeChainTokenShared{});
-// let wrapper = rb
-// .new_wrapper()
-// .eq(MEeeChainTokenShared::token_type, &eee.token_type);
 rbatis::impl_select!(MEeeChainTokenShared{select_by_token_type(token_type: &str)->Option =>"where token_type = #{token_type} limit 1"});
 
 impl MEeeChainTokenShared {
     pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_eee_chain_token_shared.sql")
+    }
+
+    #[py_sql("`select a.* from m_eee_chain_token_default b left join m_eee_chain_token_shared a on b.chain_token_shared_id = a.id`
+     `where b.net_type = #{net_type}'"
+    )]
+    pub async fn list_by_net_type(
+        rb: &mut dyn rbatis::executor::Executor,
+        net_type: &str,
+    ) -> Result<Vec<MEeeChainTokenShared>, rbatis::Error> {
+        rbatis::impled!()
+    }
+
+    #[py_sql("
+    `select a.* from m_eee_chain_token_auth b left join m_eee_chain_token_shared a on a.id = b.chain_token_shared_id `
+    ` where b.net_type = #{net_type} order by b.create_time desc limit #{page_size} offset #{offset}`
+    ")]
+    pub async fn select_left_net_type_order_create_time(
+        rb: &mut dyn rbatis::executor::Executor, net_type: &str, page_size: u64, offset: u64) -> Result<Vec<MEeeChainTokenShared>, rbatis::Error> {
+        rbatis::impled!()
     }
 }
 
@@ -84,7 +100,9 @@ pub struct MEeeChainTokenAuth {
     #[serde(default)]
     pub status: i64,
 }
-crud!(MEeeChainTokenAuth{});
+rbatis::crud!(MEeeChainTokenAuth{});
+rbatis::impl_select_page!(MEeeChainTokenAuth{select_net_type_status_order_create_time(net_type: &str, status: i64) =>
+    "`where net_type = #{net_type} and status = #{status} order by create_time desc`"});
 
 impl MEeeChainTokenAuth {
     pub const fn create_table_script() -> &'static str {
@@ -113,6 +131,8 @@ pub struct MEeeChainTokenDefault {
 rbatis::crud!(MEeeChainTokenDefault{});
 rbatis::impl_select!(MEeeChainTokenDefault{select_by_token_shared_id_and_net_type(shared_id:&str,net_type: &str)->
     Option =>"`where chain_token_shared_id = #{shared_id} and net_type = #{net_type} limit 1`"});
+rbatis::impl_select!(MEeeChainTokenDefault{select_by_net_type_status_order_position(net_type:&str,status: i64)->
+    Option =>"`where net_type = #{net_type} and status = #{status} order position by desc`"});
 
 impl MEeeChainTokenDefault {
     pub const fn create_table_script() -> &'static str {

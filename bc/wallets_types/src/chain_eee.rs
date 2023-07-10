@@ -1,9 +1,10 @@
 use async_trait::async_trait;
 use rbatis::rbatis::RBatis;
+use rbatis::sql::{IPage, PageRequest};
 
 use mav::{ChainType, CTrue, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{MAccountInfoSyncProg, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MSubChainBasicInfo, MWallet,Shared};
+use mav::ma::{MAccountInfoSyncProg, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MSubChainBasicInfo, MWallet, Shared};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
@@ -64,26 +65,13 @@ deref_type!(EeeChainTokenDefault,MEeeChainTokenDefault);
 impl EeeChainTokenDefault {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<EeeChainTokenDefault>, WalletError> {
         let tx_id = "";
-        let wallets_db = context.db().wallets_db();
+        let mut wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEeeChainTokenShared> = {
-            let default_name = MEeeChainTokenDefault::table_name();
-            let shared_name = MEeeChainTokenShared::table_name();
-            let wrapper = wallets_db.new_wrapper().eq(format!("{}.{}", default_name, MEeeChainTokenDefault::net_type).as_str(), net_type.to_string());
-
-            let sql = {
-                let t = sql_left_join_get_b(&default_name, &MEeeChainTokenDefault::chain_token_shared_id,
-                                            &shared_name, &MEeeChainTokenShared::id);
-                format!("{} where {}", t, &wrapper.sql)
-            };
-            wallets_db.fetch_prepare(tx_id, &sql, &wrapper.args).await?
+            MEeeChainTokenShared::list_by_net_type(&mut wallets_db, &net_type.to_string()).await?
         };
 
         let mut tokens_default = {
-            let wrapper = wallets_db.new_wrapper()
-                .eq(MEeeChainTokenDefault::net_type, net_type.to_string())
-                .eq(MEeeChainTokenDefault::status, CTrue)
-                .order_by(true, &[MEeeChainTokenDefault::position]);
-            MEeeChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+            MEeeChainTokenDefault::select_by_net_type_status_order_position(&mut wallets_db, &net_type.to_string(), CTrue as i64).await?
         };
         for token_default in &mut tokens_default {
             for token_shared in &tokens_shared {
@@ -110,21 +98,14 @@ deref_type!(EeeChainTokenAuth,MEeeChainTokenAuth);
 impl EeeChainTokenAuth {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<EeeChainTokenAuth>, WalletError> {
         let tx_id = "";
-        let wallets_db = context.db().wallets_db();
+        let mut wallets_db = context.db().wallets_db();
         let page_query = format!(" limit {} offset {}", page_size, start_item);
         let mut tokens_auth = {
-            let wrapper = wallets_db.new_wrapper()
-                .eq(MEeeChainTokenAuth::net_type, net_type.to_string())
-                .eq(MEeeChainTokenAuth::status, CTrue)
-                .order_by(false, &[MEeeChainTokenAuth::create_time]).push_sql(&page_query);
-            MEeeChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+            MEeeChainTokenAuth::select_net_type_status_order_create_time(&mut wallets_db, &PageRequest::new(start_item, page_size), &net_type.to_string(), CTrue as i64).await?
         };
-        let token_shared_id = format!("id in (SELECT {} FROM {} WHERE {}='{}' ORDER by {} desc {})",
-                                      MEeeChainTokenAuth::chain_token_shared_id, MEeeChainTokenAuth::table_name(), MEeeChainTokenAuth::net_type, net_type.to_string(), MEeeChainTokenAuth::create_time, page_query);
-        let token_shared_wrapper = wallets_db.new_wrapper().push_sql(&token_shared_id);
-        let tokens_shared = MEeeChainTokenShared::list_by_wrapper(wallets_db, tx_id, &token_shared_wrapper).await?;
+        let tokens_shared = MEeeChainTokenShared::select_left_net_type_order_create_time(&mut wallets_db, &net_type.to_string(), page_size, start_item).await?;
         let mut target_tokens = vec![];
-        for token_auth in &mut tokens_auth {
+        for token_auth in tokens_auth.get_records() {
             for token_shared in &tokens_shared {
                 let mut token = EeeChainTokenAuth::default();
                 if token_auth.chain_token_shared_id == token_shared.id {
@@ -203,10 +184,9 @@ impl From<MAccountInfoSyncProg> for AccountInfoSyncProg {
 }
 
 impl AccountInfoSyncProg {
-    pub async fn find_by_account(rb: &RBatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
-        let wrapper = rb.new_wrapper()
-            .eq(MAccountInfoSyncProg::account, account.to_string());
-        let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info);
+    pub async fn find_by_account(rb: &mut RBatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
+        let r = MAccountInfoSyncProg::select_by_column(rb, MAccountInfoSyncProg::account, account.to_string()).await?;
+        let r = r.first().cloned();
         Ok(r)
     }
 }
@@ -228,17 +208,13 @@ impl From<MSubChainBasicInfo> for SubChainBasicInfo {
 }
 
 impl SubChainBasicInfo {
-    pub async fn find_by_version(rb: &RBatis, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
-        let wrapper = rb.new_wrapper()
-            .eq(MSubChainBasicInfo::genesis_hash, genesis_hash.to_string())
-            .eq(MSubChainBasicInfo::runtime_version, runtime_version)
-            .eq(MSubChainBasicInfo::tx_version, tx_version);
-        let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
+    pub async fn find_by_version(rb: &mut RBatis, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
+        let r = MSubChainBasicInfo::select_genesis_hash_runtime_version_tx_version(rb, &genesis_hash.to_string(), &runtime_version.to_string(), tx_version).await?.map(|info| info.into());
         Ok(r)
     }
     pub async fn get_default_version(rb: &RBatis) -> Result<Option<SubChainBasicInfo>, WalletError> {
         let wrapper = rb.new_wrapper().eq(MSubChainBasicInfo::is_default, CTrue);
-        let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
+        let r = MSubChainBasicInfo(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }
 }
