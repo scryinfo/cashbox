@@ -1,10 +1,9 @@
 use async_trait::async_trait;
-// use rbatis::crud::CRUDTable;
-use rbatis::rbatis::Rbatis;
+use rbatis::rbatis::RBatis;
 
 use mav::{ChainType, CTrue, NetType, WalletType};
 use mav::kits::sql_left_join_get_b;
-use mav::ma::{MAccountInfoSyncProg, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MSubChainBasicInfo, MWallet};
+use mav::ma::{MAccountInfoSyncProg, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MSubChainBasicInfo, MWallet,Shared};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
 
@@ -204,7 +203,7 @@ impl From<MAccountInfoSyncProg> for AccountInfoSyncProg {
 }
 
 impl AccountInfoSyncProg {
-    pub async fn find_by_account(rb: &Rbatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
+    pub async fn find_by_account(rb: &RBatis, account: &str) -> Result<Option<MAccountInfoSyncProg>, WalletError> {
         let wrapper = rb.new_wrapper()
             .eq(MAccountInfoSyncProg::account, account.to_string());
         let r = MAccountInfoSyncProg::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info);
@@ -229,7 +228,7 @@ impl From<MSubChainBasicInfo> for SubChainBasicInfo {
 }
 
 impl SubChainBasicInfo {
-    pub async fn find_by_version(rb: &Rbatis, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
+    pub async fn find_by_version(rb: &RBatis, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
         let wrapper = rb.new_wrapper()
             .eq(MSubChainBasicInfo::genesis_hash, genesis_hash.to_string())
             .eq(MSubChainBasicInfo::runtime_version, runtime_version)
@@ -237,7 +236,7 @@ impl SubChainBasicInfo {
         let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)
     }
-    pub async fn get_default_version(rb: &Rbatis) -> Result<Option<SubChainBasicInfo>, WalletError> {
+    pub async fn get_default_version(rb: &RBatis) -> Result<Option<SubChainBasicInfo>, WalletError> {
         let wrapper = rb.new_wrapper().eq(MSubChainBasicInfo::is_default, CTrue);
         let r = MSubChainBasicInfo::fetch_by_wrapper(rb, "", &wrapper).await?.map(|info| info.into());
         Ok(r)

@@ -59,6 +59,14 @@ pub struct MEthChainTokenShared {
 rbatis::crud!(MEthChainTokenShared{});
 rbatis::impl_select!(MEthChainTokenShared{select_by_token_type(t : &str) -> Option => "`where token_type = #{t} limit 1`"});
 rbatis::impl_select!(MEthChainTokenShared{select_by_id(id : &str) -> Option => "`where id = #{id} limit 1`"});
+rbatis::impl_select_page!(MEthChainTokenShared{select_page_by_name_and_in(name : &str, contract_addr:&str, net_type:&str) =>"
+    'where 1=1'
+    if !name.is_empty():
+        ` name like %#{name}%`
+    ` and id in (select chain_token_shared_id from m_eth_chain_token_auth where net_type = #{net_type}`
+    if !contract_addr.is_empty():
+        ` contract_address like %#{contract_addr}%`
+    `)`"});
 
 impl MEthChainTokenShared {
     pub const fn create_table_script() -> &'static str {

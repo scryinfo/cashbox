@@ -17,6 +17,8 @@ pub struct MSetting {
     #[serde(default)]
     pub value_str: String,
 }
+rbatis::crud!(MSetting{});
+rbatis::impl_select!(MSetting{select_by_key(key: &str)-> Option => "`where key_str= #{key}`"});
 
 impl MSetting {
     pub const fn create_table_script() -> &'static str {

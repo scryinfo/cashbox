@@ -119,31 +119,19 @@ impl EthChainTokenAuth {
     }
 
     pub async fn query_by_condition(context: &dyn ContextTrait, net_type: &NetType, name: Option<String>, contract_addr: Option<String>, start_item: u64, page_size: u64) -> Result<Vec<EthChainTokenAuth>, WalletError> {
-        let tx_id = "";
         let mut rb = context.db().wallets_db();
-        let page_query = format!(" limit {} offset {}", page_size, start_item);
 
-        let mut token_condition_sql = String::from(" where 1==1 ");
-        if name.is_some() {
-            let name_condition = format!(" and {}||{} like '%{}%'", MTokenShared::name, MTokenShared::symbol, name.unwrap());
-            token_condition_sql.push_str(&name_condition);
-        }
-        let shared_id_prefix = format!(" and id in (SELECT {} FROM {} WHERE {}='{}'",
-                                       MEthChainTokenAuth::chain_token_shared_id, MEthChainTokenAuth::table_name(), MEthChainTokenAuth::net_type, net_type.to_string());
-        token_condition_sql.push_str(&shared_id_prefix);
-        if contract_addr.is_some() {
-            let token_shared_id = format!("and {} like '%{}%'", MEthChainTokenAuth::contract_address, contract_addr.unwrap());
-            token_condition_sql.push_str(&token_shared_id);
-        }
-        token_condition_sql.push_str(")");
+        let name = name.unwrap_or_default();
+        let contract_addr = contract_addr.unwrap_or_default();
 
-        token_condition_sql.push_str(&page_query);
-
-        let token_shared_wrapper = rb.new_wrapper().push_sql(&token_condition_sql);
-        let tokens_shared = MEthChainTokenShared::list_by_wrapper(rb, tx_id, &token_shared_wrapper).await?;
+        let tokens_shared = {
+            MEthChainTokenShared::select_page_by_name_and_in(
+                &mut rb, &PageRequest::new(start_item, page_size),
+                &name, &contract_addr, &net_type.to_string()).await?
+        };
         let mut target_tokens = vec![];
 
-        for token_shared in &tokens_shared {
+        for token_shared in tokens_shared.get_records() {
             let tokens_auth = {
                 MEthChainTokenAuth::select_by_shared_id_net_type_status(&mut rb, &token_shared.id, &net_type.to_string(), CTrue as i64).await?
             };

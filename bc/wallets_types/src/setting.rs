@@ -36,11 +36,11 @@ impl Setting {
     }
 
     pub async fn change_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<u64, WalletError> {
-        let rb = context.db().wallets_db();
+        let mut rb = context.db().wallets_db();
         let mut wallet_setting = Setting::get_setting(context, &SettingType::CurrentNetType).await?.unwrap_or_default();
         wallet_setting.key_str = SettingType::CurrentNetType.to_string();
         wallet_setting.value_str = net_type.to_string();
-        wallet_setting.save_update(rb, "").await.map(|ret| ret.rows_affected).map_err(|err| WalletError::RbatisError(err))
+        MSetting::update_by_column(&mut rb, &wallet_setting, MSetting::id).await.map(|ret| ret.rows_affected).map_err(|err| WalletError::RbatisError(err))
     }
 
 
@@ -51,32 +51,30 @@ impl Setting {
         let mut chain_setting = Setting::get_setting(context, &SettingType::CurrentChain).await?.unwrap_or_default();
 
         //tx 只处理异常情况下，事务的rollback，所以会在事务提交成功后，调用 tx.manager = None; 阻止 [rbatis::tx::TxGuard]再管理事务
-        let mut tx = rb.begin_tx_defer(false).await?;
+        let mut tx = rb.acquire_begin().await?;
         wallet_setting.key_str = SettingType::CurrentWallet.to_string();
         wallet_setting.value_str = wallet_id.to_owned();
-        wallet_setting.save_update(rb, &tx.tx_id).await?;
+        MSetting::update_by_column(&mut tx, &wallet_setting, MSetting::id).await?;
         chain_setting.value_str = chain_type.to_string();
         chain_setting.key_str = SettingType::CurrentChain.to_string();
-        chain_setting.save_update(rb, &tx.tx_id).await?;
-        rb.commit(&tx.tx_id).await?;
-        tx.manager = None;
+        MSetting::update_by_column(&mut tx, &chain_setting, MSetting::id).await?;
+        tx.commit().await?;
         Ok(())
     }
 
     pub async fn save_current_database_version(context: &dyn ContextTrait, version_value: &str) -> Result<(), WalletError> {
-        let rb = context.db().wallets_db();
+        let mut rb = context.db().wallets_db();
         let mut wallet_setting = Setting::get_setting(context, &SettingType::CurrentDbVersion).await?.unwrap_or_default();
         wallet_setting.key_str = SettingType::CurrentDbVersion.to_string();
         wallet_setting.value_str = version_value.to_string();
-        wallet_setting.save_update(rb, "").await?;
+        MSetting::update_by_column(&mut rb, &wallet_setting, MSetting::id).await?;
         Ok(())
     }
 
     ///如果没有找到返回 none
     pub async fn get_setting(context: &dyn ContextTrait, key: &SettingType) -> Result<Option<MSetting>, WalletError> {
-        let rb = context.db().wallets_db();
-        let wrapper = rb.new_wrapper().eq(MSetting::key_str, key.to_string());
-        let r = MSetting::fetch_by_wrapper(rb, "", &wrapper).await?;
+        let mut rb = context.db().wallets_db();
+        let r = MSetting::select_by_key(&mut rb,  &key.to_string()).await?;
         Ok(r)
     }
 }
