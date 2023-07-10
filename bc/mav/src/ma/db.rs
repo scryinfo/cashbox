@@ -10,6 +10,7 @@ use crate::ma::dao::Shared;
 use crate::{CTrue, kits, NetType};
 use crate::kits::Error;
 use crate::ma::{BtcTokenType, EeeTokenType, EthTokenType, MAccountInfoSyncProg, MAddress, MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MChainTypeMeta, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MEeeChainTx, MEeeTokenxTx, MEthChainToken, MEthChainTokenAuth, MEthChainTokenDefault, MEthChainTokenNonAuth, MEthChainTokenShared, MEthChainTx, MMnemonic, MSetting, MSubChainBasicInfo, MTokenAddress, MTokenShared, MWallet};
+use crate::ma::dao::BeforeSave;
 
 /// Note that cashbox is currently on version 1. Version 2 is this version,
 /// when cashbox want to update version we must synchronize this database version value;
@@ -319,7 +320,7 @@ impl Db {
     pub async fn insert_chain_token(db: &Db) -> Result<(), Error> {
         {
             //eth
-            let rb = db.wallets_db();
+            let mut rb = db.wallets_db();
             let token_shared = {
                 let mut eth = MEthChainTokenShared {
                     token_type: EthTokenType::Eth.to_string(),
@@ -336,15 +337,13 @@ impl Db {
                     ..Default::default()
                 };
                 let old_eth = {
-                    let wrapper = rb
-                        .new_wrapper()
-                        .eq(MEeeChainTokenShared::token_type, &eth.token_type);
-                    MEthChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
+                    MEthChainTokenShared::select_by_token_type(&mut rb, &eth.token_type).await?
                 };
                 if let Some(t) = old_eth {
                     eth = t;
                 } else {
-                    eth.save(rb, "").await?;
+                    eth.before_save();
+                    MEthChainTokenShared::insert(&mut rb, &eth).await?;
                 }
                 eth
             };

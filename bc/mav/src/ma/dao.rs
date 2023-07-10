@@ -1,10 +1,10 @@
 use async_trait::async_trait;
+use rbatis::rbatis::RBatis;
+use rbatis::rbdc;
 // use rbatis::core::db::DBExecResult;
 // use rbatis::core::Result;
 // use rbatis::crud::{CRUD, CRUDTable};
 use rbatis::sql::page::{IPageRequest, Page};
-use rbatis::rbatis::RBatis;
-use rbatis::rbdc::db::ExecResult;
 // use rbatis::wrapper::Wrapper;
 use serde::{de, Deserialize, Deserializer, Serializer};
 use serde::de::Unexpected;
@@ -33,13 +33,21 @@ pub trait BeforeSave {
 pub trait BeforeUpdate {
     fn before_update(&mut self);
 }
-//
+
+pub type RBatisExResult = std::result::Result<rbatis::rbdc::db::ExecResult, rbatis::rbdc::Error>;
+
 // #[async_trait]
-// pub trait Dao<T: serde::Serialize + serde::Deserialize + Shared> {
+// pub trait CrudC<T> {
+//     async fn insert(rb: &mut dyn rbatis::executor::Executor, m: &T) -> RBatisExResult;
+//     async fn insert_batch(rb: &mut dyn rbatis::executor::Executor, ms: &[T], batch_size: u64) -> RBatisExResult;
+// }
+
+// #[async_trait]
+// pub trait Dao<T: Shared + CrudC<T>> {
 //     /// 调用 before_save 然后 insert 到数据 database,
-//     async fn save(&mut self, rb: &RBatis, tx_id: &str) -> rbatis::Result<ExecResult>;
+//     async fn save(&mut self, rb: &mut dyn rbatis::executor::Executor) -> RBatisExResult;
 //     /// 调用 before_save 然后 insert 到数据 database,
-//     async fn save_batch(rb: &RBatis, tx_id: &str, ms: &mut [T]) -> rbatis::Result<ExecResult>;
+//     async fn save_batch(rb: &mut dyn rbatis::executor::Executor, ms: &mut [T]) -> RBatisExResult;
 //     /// 如果id为空，调用save，
 //     /// 如果id不为空，调用update_by_id, 且 last_insert_id为none
 //     async fn save_update(&mut self, rb: &RBatis, tx_id: &str) -> rbatis::Result<ExecResult>;
@@ -71,21 +79,22 @@ pub trait BeforeUpdate {
 //     ///使用count计算数据的条数
 //     async fn count_by_wrapper(rb: &RBatis, tx_id: &str, w: &Wrapper) -> Result<i64> where T: 'async_trait;
 // }
+
 //
 // #[async_trait]
 // impl<T> Dao<T> for T where
-//     T: CRUDTable + Shared + BeforeSave + BeforeUpdate,
+//     T: Shared + BeforeSave + BeforeUpdate + CrudC<T>,
 // {
-//     async fn save(&mut self, rb: &RBatis, tx_id: &str) -> Result<DBExecResult> {
+//     async fn save(&mut self, rb: &mut dyn rbatis::executor::Executor) -> RBatisExResult {
 //         self.before_save();
-//         rb.save(tx_id, self).await
+//         T::insert(rb, &self).await
 //     }
 //
-//     async fn save_batch(rb: &RBatis, tx_id: &str, ms: &mut [T]) -> Result<DBExecResult> {
+//     async fn save_batch(rb: &mut dyn rbatis::executor::Executor, ms: &mut [T]) -> RBatisExResult {
 //         for it in ms.iter_mut() {
 //             it.before_save();
 //         }
-//         rb.save_batch(tx_id, ms).await
+//         T::insert_batch(rb, ms).await
 //     }
 //
 //     async fn save_update(&mut self, rb: &RBatis, tx_id: &str) -> Result<DBExecResult> {

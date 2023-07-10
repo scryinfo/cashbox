@@ -7,6 +7,7 @@ use serde::Serialize;
 use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};

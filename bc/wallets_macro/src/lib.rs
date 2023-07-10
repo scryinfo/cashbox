@@ -61,7 +61,7 @@ mod cr;
 /// }
 /// ````
 #[proc_macro_attribute]
-pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn db_append_shared(_: TokenStream, input: TokenStream) -> TokenStream {
     let mut ast = parse_macro_input!(input as DeriveInput);
     // let args = parse_macro_input!(args as AttributeArgs);
 
@@ -77,10 +77,12 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
     ast.append_named(fields_additional);
 
     let name = &ast.ident;
-    let table_name: proc_macro2::TokenStream = {
+    // let table_name: proc_macro2::TokenStream = {
+    let table_name = {
         let mut t = to_snake_name(&name.to_string());
         t = format!("\"{}\".to_owned()", t);
-        t.parse().unwrap()
+        proc_macro2::TokenStream::from_str(&t).unwrap()
+        // t.parse().unwrap()
     };
     let imp_base = quote! {
         impl Shared for #name {
@@ -105,19 +107,22 @@ pub fn db_append_shared(args: TokenStream, input: TokenStream) -> TokenStream {
                 #table_name
             }
         }
+        // #[async_trait]
+        // impl<#name> CrudC<#name> for #name {
+        //     async fn insert(rb: &mut dyn rbatis::executor::Executor, m: &#name) -> RBatisExResult{
+        //         #name::insert(rb,m).await
+        //     }
+        //     async fn insert_batch(rb: &mut dyn rbatis::executor::Executor, ms: &[#name]) -> RBatisExResult{
+        //         #name::insert_batch(rb,ms).await
+        //     }
+        // }
     };
-
-    let impl_crud = quote! {
-        // rbatis::crud!(MEeeChainTokenShared);
-    };
-
 
     let fields_stream = db_field_name(&ast.ident, &ast.fields());
     let gen = TokenStream::from(quote! {
             #ast
             #fields_stream
             #imp_base
-            #impl_crud
         });
     if cfg!(feature = "print_macro") {
         println!("\n............gen impl db_append_shared {}:\n {}\n", name, gen);

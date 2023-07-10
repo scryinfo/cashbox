@@ -5,6 +5,7 @@ use serde::Serialize;
 use strum_macros::EnumIter;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
+use async_trait::async_trait;
 
 use crate::kits;
 use crate::ma::dao::{self, Shared};
@@ -55,6 +56,10 @@ pub struct MEthChainTokenShared {
     #[serde(default)]
     pub decimal: i32,
 }
+// .eq(MEeeChainTokenShared::token_type, &eth.token_type);
+// MEthChainTokenShared::fetch_by_wrapper(rb, "", &wrapper).await?
+rbatis::crud!(MEthChainTokenShared{});
+rbatis::impl_select!(MEthChainTokenShared{select_by_token_type(t : &str) -> Option => "`where token_type = #{t} limit 1`"});
 
 impl MEthChainTokenShared {
     pub const fn create_table_script() -> &'static str {
