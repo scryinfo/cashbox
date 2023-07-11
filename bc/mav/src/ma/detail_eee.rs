@@ -60,6 +60,7 @@ pub struct MEeeChainTokenShared {
 
 rbatis::crud!(MEeeChainTokenShared{});
 rbatis::impl_select!(MEeeChainTokenShared{select_by_token_type(token_type: &str)->Option =>"where token_type = #{token_type} limit 1"});
+rbatis::impl_select!(MEeeChainTokenShared{select_by_id(id: &str)->Option =>"where id = #{id}"});
 
 impl MEeeChainTokenShared {
     pub const fn create_table_script() -> &'static str {

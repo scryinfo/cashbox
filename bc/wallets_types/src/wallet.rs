@@ -73,7 +73,7 @@ impl Wallet {
         Ok(w)
     }
     pub async fn remove_by_id(context: &dyn ContextTrait, wallet_id: &str) -> Result<u64, WalletError> {
-        let mut rb = context.db().wallets_db();
+        let rb = context.db().wallets_db();
         let mut tx = rb.acquire_begin().await?;
         let re = MWallet::delete_by_column(&mut tx, MWallet::id, &wallet_id.to_owned()).await?;
         //todo 删除相关表
@@ -81,7 +81,7 @@ impl Wallet {
         Ok(re.rows_affected)
     }
 
-    pub async fn update_by_id(context: &dyn ContextTrait, m_wallet: &mut MWallet, tx_id: &str) -> Result<u64, WalletError> {
+    pub async fn update_by_id(context: &dyn ContextTrait, m_wallet: &mut MWallet) -> Result<u64, WalletError> {
         let mut rb = context.db().wallets_db();
         let re = MWallet::update_by_column(&mut rb, &m_wallet, MWallet::id).await?;
         //todo 其它字段怎么处理？

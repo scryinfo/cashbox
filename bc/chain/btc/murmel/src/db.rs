@@ -10,22 +10,22 @@ use async_trait::async_trait;
 use futures::executor::block_on;
 use log::{debug, error, info};
 use once_cell::sync::OnceCell;
-use rbatis::core::db::DBExecResult;
-use rbatis::crud::CRUD;
-use rbatis::crud::CRUDTable;
-use rbatis::plugin::page::{IPage, Page, PageRequest};
-use rbatis::rbatis::Rbatis;
-use rbatis::wrapper::Wrapper;
-use rbatis_core::Error;
+// use rbatis::core::db::DBExecResult;
+// use rbatis::crud::CRUD;
+// use rbatis::crud::CRUDTable;
+use rbatis::sql::{IPage, Page, PageRequest};
+use rbatis::rbatis::RBatis;
+// use rbatis::wrapper::Wrapper;
+use rbatis::Error;
 use strum_macros::{EnumIter, EnumString, ToString};
 
 use bitcoin::{BitcoinHash, Network};
 use bitcoin::blockdata::constants::genesis_block;
 use bitcoin::hashes::hex::ToHex;
 use bitcoin::network::message_bloom_filter::FilterLoadMessage;
-use mav::ma::{Dao, MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcUtxo};
+use mav::ma::{MAddress, MBlockHeader, MBtcChainTx, MBtcInputTx, MBtcOutputTx, MBtcUtxo};
 use mav::ma::{MLocalTxLog, MProgress};
-use wallets_types::{BtcBalance, BtcNowLoadBlock};
+use wallets_types::{BtcBalance, BtcNowLoadBlock, WalletError};
 
 use crate::kit;
 use crate::path::PATH;
@@ -45,7 +45,7 @@ pub enum BtcTxState {
 
 #[derive(Debug)]
 pub struct ChainSqlite {
-    rb: Rbatis,
+    rb: RBatis,
     network: Network,
 }
 
@@ -60,15 +60,15 @@ impl ChainSqlite {
     }
 
     pub async fn save_header(
-        &self,
+        &mut self,
         header: String,
         timestamp: String,
-    ) -> Result<DBExecResult, Error> {
+    ) -> Result<rbatis::rbdc::db::ExecResult, rbatis::rbdc::Error> {
         let mut block_header = MBlockHeader::default();
         block_header.scanned = "0".to_owned();
         block_header.header = header;
         block_header.timestamp = timestamp;
-        block_header.save(&self.rb, "").await
+        MBlockHeader::insert(&mut self.rb, &block_header).await
     }
 
     /// fetch header which needed scan
@@ -156,7 +156,7 @@ impl ChainSqlite {
 
 #[derive(Debug)]
 pub struct DetailSqlite {
-    rb: Rbatis,
+    rb: RBatis,
     network: Network,
 }
 
@@ -170,7 +170,7 @@ impl<'a> DetailSqlite {
         Ok(Self { rb, network })
     }
 
-    async fn init_table(rb: &Rbatis) -> Result<(), Error> {
+    async fn init_table(rb: &RBatis) -> Result<(), Error> {
         DetailSqlite::create_progress(rb).await?;
         DetailSqlite::create_address(rb).await?;
         DetailSqlite::create_btc_input_tx(rb).await?;
@@ -181,31 +181,31 @@ impl<'a> DetailSqlite {
         Ok(())
     }
 
-    async fn create_address(rb: &Rbatis) -> Result<DBExecResult, Error> {
+    async fn create_address(rb: &RBatis) -> Result<rbatis::rbdc::db::ExecResult, Error> {
         rb.exec("", MAddress::create_table_script()).await
     }
 
-    async fn create_btc_input_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
+    async fn create_btc_input_tx(rb: &RBatis) -> Result<rbatis::rbdc::db::ExecResult, Error> {
         rb.exec("", MBtcInputTx::create_table_script()).await
     }
 
-    async fn create_btc_output_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
+    async fn create_btc_output_tx(rb: &RBatis) -> Result<rbatis::rbdc::db::ExecResult, Error> {
         rb.exec("", MBtcOutputTx::create_table_script()).await
     }
 
-    async fn create_btc_chain_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
+    async fn create_btc_chain_tx(rb: &RBatis) -> Result<rbatis::rbdc::db::ExecResult, Error> {
         rb.exec("", MBtcChainTx::create_table_script()).await
     }
 
-    async fn create_progress(rb: &Rbatis) -> Result<DBExecResult, Error> {
+    async fn create_progress(rb: &RBatis) -> Result<rbatis::rbdc::db::ExecResult, Error> {
         rb.exec("", MProgress::create_table_script()).await
     }
 
-    async fn create_local_tx(rb: &Rbatis) -> Result<DBExecResult, Error> {
+    async fn create_local_tx(rb: &RBatis) -> Result<rbatis::rbdc::db::ExecResult, Error> {
         rb.exec("", MLocalTxLog::create_table_script()).await
     }
 
-    async fn create_btc_utxo(rb: &Rbatis) -> Result<DBExecResult, Error> {
+    async fn create_btc_utxo(rb: &RBatis) -> Result<rbatis::rbdc::db::ExecResult, Error> {
         rb.exec("", MBtcUtxo::create_table_script()).await
     }
 
@@ -469,14 +469,14 @@ impl<'a> DetailSqlite {
 
 #[async_trait]
 trait RInit {
-    async fn init_rbatis(db_file_name: &str) -> Rbatis {
+    async fn init_rbatis(db_file_name: &str) -> RBatis {
         if std::fs::metadata(db_file_name).is_err() {
             let file = std::fs::File::create(db_file_name);
             if file.is_err() {
                 info!("error when init file {:?}", file.err().unwrap());
             }
         }
-        let rb = Rbatis::new();
+        let rb = RBatis::new();
         let url = "sqlite://".to_owned().add(db_file_name);
         info!("file url: {:?}", url);
         let r = rb.link(url.as_str()).await;

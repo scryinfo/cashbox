@@ -71,5 +71,4 @@ strum_macros = "0.25.0"
 wallets_types = { path = "../../../wallets_types" }
 
 [dev-dependencies]
-rustc-serialize = "0.3"
 tempfile = "3.0.2"

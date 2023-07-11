@@ -1,7 +1,7 @@
 use async_trait::async_trait;
+use rbatis::sql::{IPage, PageRequest};
 
 use mav::{ChainType, CTrue, NetType, WalletType};
-use mav::kits::sql_left_join_get_b;
 use mav::ma::{MBtcChainToken, MBtcChainTokenAuth, MBtcChainTokenDefault, MBtcChainTokenShared, MWallet, Shared};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
@@ -20,8 +20,8 @@ impl Load for BtcChainToken {
     type MType = MBtcChainToken;
     async fn load(&mut self, context: &dyn ContextTrait, m: Self::MType) -> Result<(), WalletError> {
         self.m = m;
-        let rb = context.db().wallets_db();
-        let token_shared = MBtcChainTokenShared::fetch_by_id(rb, "", &self.chain_token_shared_id).await?;
+        let mut rb = context.db().wallets_db();
+        let token_shared = MBtcChainTokenShared::select_by_id(&mut rb, &self.chain_token_shared_id).await?;
         let token_shared = token_shared.ok_or_else(||
             WalletError::NoneError(format!("do not find id:{}, in {}", &self.chain_token_shared_id, MBtcChainTokenShared::table_name())))?;
         self.btc_chain_token_shared.load(context, token_shared).await?;
@@ -64,30 +64,14 @@ deref_type!(BtcChainTokenDefault,MBtcChainTokenDefault);
 
 impl BtcChainTokenDefault {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<BtcChainTokenDefault>, WalletError> {
-        let tx_id = "";
-        let wallets_db = context.db().wallets_db();
+        let mut wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MBtcChainTokenShared> = {
-            let default_name = MBtcChainTokenDefault::table_name();
-            let shared_name = MBtcChainTokenShared::table_name();
-            let wrapper = wallets_db.new_wrapper()
-                .eq(format!("{}.{}", default_name, MBtcChainTokenDefault::net_type).as_str(), net_type.to_string());
-
-            let sql = {
-                //wrapper = wrapper;
-                let t = sql_left_join_get_b(&default_name, &MBtcChainTokenDefault::chain_token_shared_id,
-                                            &shared_name, &MBtcChainTokenShared::id);
-                format!("{} where {}", t, &wrapper.sql)
-            };
-            wallets_db.fetch_prepare(tx_id, &sql, &wrapper.args).await?
+            MBtcChainTokenShared::list_by_net_type(&mut wallets_db,&net_type.to_string()).await?
         };
 
         let mut tokens_default = {
-            let wrapper = wallets_db.new_wrapper()
-                .eq(MBtcChainTokenDefault::net_type, net_type.to_string())
-                .eq(MBtcChainTokenDefault::status, CTrue)
-
-                .order_by(true, &[MBtcChainTokenDefault::position]);
-            MBtcChainTokenDefault::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+            MBtcChainTokenDefault::select_net_type_statis_order_position(
+                &mut wallets_db, &net_type.to_string(), CTrue as i64).await?
         };
         for token_default in &mut tokens_default {
             for token_shared in &tokens_shared {
@@ -114,22 +98,15 @@ deref_type!(BtcChainTokenAuth,MBtcChainTokenAuth);
 
 impl BtcChainTokenAuth {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<BtcChainTokenAuth>, WalletError> {
-        let tx_id = "";
-        let wallets_db = context.db().wallets_db();
-        let page_query = format!(" limit {} offset {}", page_size, start_item);
-        let mut tokens_auth = {
-            let wrapper = wallets_db.new_wrapper()
-                .eq(MBtcChainTokenAuth::net_type, net_type.to_string())
-                .eq(MBtcChainTokenAuth::status, CTrue)
-                .order_by(false, &[MBtcChainTokenAuth::create_time]).push_sql(&page_query);
-            MBtcChainTokenAuth::list_by_wrapper(wallets_db, tx_id, &wrapper).await?
+        let mut wallets_db = context.db().wallets_db();
+        let tokens_auth = {
+            MBtcChainTokenAuth::select_net_type_status_order_create_time(
+                &mut wallets_db, &PageRequest::new(start_item, page_size),
+                &net_type.to_string(), CTrue as i64).await?
         };
-        let token_shared_id = format!("id in (SELECT {} FROM {} WHERE {}='{}' ORDER by {} desc {})",
-                                      MBtcChainTokenAuth::chain_token_shared_id, MBtcChainTokenAuth::table_name(), MBtcChainTokenAuth::net_type, net_type.to_string(), MBtcChainTokenAuth::create_time, page_query);
-        let token_shared_wrapper = wallets_db.new_wrapper().push_sql(&token_shared_id);
-        let tokens_shared = MBtcChainTokenShared::list_by_wrapper(wallets_db, tx_id, &token_shared_wrapper).await?;
+        let tokens_shared = MBtcChainTokenShared::select_auth_page_net_type_and_id_in(&mut wallets_db, &net_type.to_string(), start_item,page_size).await?;
         let mut target_tokens = vec![];
-        for token_auth in &mut tokens_auth {
+        for token_auth in  tokens_auth.get_records() {
             for token_shared in &tokens_shared {
                 let mut token = BtcChainTokenAuth::default();
                 if token_auth.chain_token_shared_id == token_shared.id {

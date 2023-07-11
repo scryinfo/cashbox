@@ -1,6 +1,7 @@
 use serde::Deserialize;
 use serde::Serialize;
 use strum_macros::EnumIter;
+use rbatis::py_sql;
 
 use wallets_macro::{db_append_shared, DbBeforeSave, DbBeforeUpdate};
 
@@ -52,12 +53,32 @@ pub struct MBtcChainTokenShared {
 }
 
 rbatis::crud!(MBtcChainTokenShared{});
+rbatis::impl_select!(MBtcChainTokenShared{select_by_id(id:&str) -> Option =>
+    "`where id = #{id}`"});
 rbatis::impl_select!(MBtcChainTokenShared{select_by_token_type(token_type:&str)->
     Option => "'where token_type = #{token_type}'"});
 
 impl MBtcChainTokenShared {
     pub const fn create_table_script() -> &'static str {
         std::include_str!("../../../sql/m_btc_chain_token_shared.sql")
+    }
+    #[py_sql("`select a.* from m_btc_chain_token_default b left join m_btc_chain_token_shared a on b.chain_token_shared_id = a.id`
+     ` where b.net_type = #{net_type}'"
+    )]
+    pub async fn list_by_net_type(
+        rb: &mut dyn rbatis::executor::Executor,
+        net_type: &str,
+    ) -> Result<Vec<MBtcChainTokenShared>, rbatis::Error> {
+        rbatis::impled!()
+    }
+
+    #[py_sql("`select * from m_btc_chain_token_shared where id in (select id from m_btc_chain_token_auth where net_type = #{net_type} oder by create_time desc limit #{page_size} offset #{start_item})`")]
+    pub async fn select_auth_page_net_type_and_id_in(
+        rb: &mut dyn rbatis::executor::Executor,
+        net_type: &str,
+        start_item: u64, page_size: u64,
+    ) -> Result<Vec<MBtcChainTokenShared>, rbatis::Error> {
+        rbatis::impled!()
     }
 }
 
@@ -75,6 +96,10 @@ pub struct MBtcChainTokenAuth {
     #[serde(default)]
     pub status: i64,
 }
+
+rbatis::crud!(MBtcChainTokenAuth{});
+rbatis::impl_select_page!(MBtcChainTokenAuth{select_net_type_status_order_create_time(net_type:&str, status: i64)
+    => "`where net_type= #{net_type} and status= #{status} order by create_time desc`"});
 
 impl MBtcChainTokenAuth {
     pub const fn create_table_script() -> &'static str {
@@ -99,15 +124,13 @@ pub struct MBtcChainTokenDefault {
     #[serde(skip)]
     pub chain_token_shared: MBtcChainTokenShared,
 }
-// let wrapper = rb.new_wrapper()
-// .eq(
-// MBtcChainTokenDefault::chain_token_shared_id,
-// token_shared.id.clone(),
-// )
-// .eq(MBtcChainTokenDefault::net_type, net_type.to_string());
 rbatis::crud!(MBtcChainTokenDefault{});
 rbatis::impl_select!(MBtcChainTokenDefault{select_by_token_shared_id_and_net_type(shared_id:&str, net_type:&str)->
     Option => "`where chain_token_shared_id = #{shared_id} and net_type = #{net_type}`"});
+rbatis::impl_select!(MBtcChainTokenDefault{select_net_type_statis_order_position(net_type:&str, status:i64)
+    => "`where net_type = #{net_type} and status = #{status} order by position desc`"});
+
+
 
 impl MBtcChainTokenDefault {
     pub const fn create_table_script() -> &'static str {

@@ -3,7 +3,6 @@ use rbatis::rbatis::RBatis;
 use rbatis::sql::{IPage, PageRequest};
 
 use mav::{ChainType, CTrue, NetType, WalletType};
-use mav::kits::sql_left_join_get_b;
 use mav::ma::{MAccountInfoSyncProg, MEeeChainToken, MEeeChainTokenAuth, MEeeChainTokenDefault, MEeeChainTokenShared, MSubChainBasicInfo, MWallet, Shared};
 
 use crate::{Chain2WalletType, ChainShared, ContextTrait, deref_type, Load, WalletError};
@@ -20,8 +19,8 @@ impl Load for EeeChainToken {
     type MType = MEeeChainToken;
     async fn load(&mut self, context: &dyn ContextTrait, m: Self::MType) -> Result<(), WalletError> {
         self.m = m;
-        let rb = context.db().wallets_db();
-        let token_shared = MEeeChainTokenShared::fetch_by_id(rb, "", &self.chain_token_shared_id).await?;
+        let mut rb = context.db().wallets_db();
+        let token_shared = MEeeChainTokenShared::select_by_id(&mut rb, &self.chain_token_shared_id).await?;
         let token_shared = token_shared.ok_or_else(||
             WalletError::NoneError(format!("do not find id:{}, in {}", &self.chain_token_shared_id, MEeeChainTokenShared::table_name())))?;
         self.eee_chain_token_shared.load(context, token_shared).await?;
@@ -64,7 +63,6 @@ deref_type!(EeeChainTokenDefault,MEeeChainTokenDefault);
 
 impl EeeChainTokenDefault {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType) -> Result<Vec<EeeChainTokenDefault>, WalletError> {
-        let tx_id = "";
         let mut wallets_db = context.db().wallets_db();
         let tokens_shared: Vec<MEeeChainTokenShared> = {
             MEeeChainTokenShared::list_by_net_type(&mut wallets_db, &net_type.to_string()).await?
@@ -97,10 +95,8 @@ deref_type!(EeeChainTokenAuth,MEeeChainTokenAuth);
 
 impl EeeChainTokenAuth {
     pub async fn list_by_net_type(context: &dyn ContextTrait, net_type: &NetType, start_item: u64, page_size: u64) -> Result<Vec<EeeChainTokenAuth>, WalletError> {
-        let tx_id = "";
         let mut wallets_db = context.db().wallets_db();
-        let page_query = format!(" limit {} offset {}", page_size, start_item);
-        let mut tokens_auth = {
+        let tokens_auth = {
             MEeeChainTokenAuth::select_net_type_status_order_create_time(&mut wallets_db, &PageRequest::new(start_item, page_size), &net_type.to_string(), CTrue as i64).await?
         };
         let tokens_shared = MEeeChainTokenShared::select_left_net_type_order_create_time(&mut wallets_db, &net_type.to_string(), page_size, start_item).await?;
@@ -209,12 +205,13 @@ impl From<MSubChainBasicInfo> for SubChainBasicInfo {
 
 impl SubChainBasicInfo {
     pub async fn find_by_version(rb: &mut RBatis, genesis_hash: &str, runtime_version: i32, tx_version: i32) -> Result<Option<SubChainBasicInfo>, WalletError> {
-        let r = MSubChainBasicInfo::select_genesis_hash_runtime_version_tx_version(rb, &genesis_hash.to_string(), &runtime_version.to_string(), tx_version).await?.map(|info| info.into());
+        let r = MSubChainBasicInfo::select_genesis_hash_runtime_version_tx_version(rb, &genesis_hash.to_string(), &runtime_version.to_string(), tx_version).await?;
+        let r = r.map(|info|info.into());
         Ok(r)
     }
-    pub async fn get_default_version(rb: &RBatis) -> Result<Option<SubChainBasicInfo>, WalletError> {
-        let wrapper = rb.new_wrapper().eq(MSubChainBasicInfo::is_default, CTrue);
-        let r = MSubChainBasicInfo(rb, "", &wrapper).await?.map(|info| info.into());
+    pub async fn get_default_version(rb: &mut RBatis) -> Result<Option<SubChainBasicInfo>, WalletError> {
+        let r = MSubChainBasicInfo::select_by_column(rb,MSubChainBasicInfo::is_default, CTrue as u32).await?;
+        let r = r.first().map(|info|info.clone().into());
         Ok(r)
     }
 }

@@ -9,4 +9,4 @@ hex = { version = "0.4" }
 ring = "0.16.9"
 rand = "0.8.5"
 tiny-keccak = { version = "2.0", features = ["keccak"] }
-rust-crypto = "0.2"
+rust-crypto = "0.2.36"

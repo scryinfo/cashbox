@@ -161,6 +161,7 @@ pub struct MBlockHeader {
     #[serde(default)]
     pub timestamp: String,
 }
+rbatis::crud!(MBlockHeader{});
 
 impl MBlockHeader {
     pub const fn create_table_script() -> &'static str {
